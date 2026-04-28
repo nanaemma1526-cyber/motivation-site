@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>God's Plan Emmanuel | Daily Motivation</title>
+    <meta name="description" content="Daily motivational and inspirational quotes by God's Plan Emmanuel.">
+    <meta name="theme-color" content="#0a0f2a">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #0a0f2a;
+            color: #f5c542;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .welcome {
+            text-align: center;
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            font-style: italic;
+            border-bottom: 1px solid #f5c542;
+            display: inline-block;
+            width: 100%;
+            padding-bottom: 10px;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2rem;
+            margin: 20px 0 10px;
+            color: #f5c542;
+        }
+        .profile-pic {
+            text-align: center;
+            margin: 20px 0 30px;
+        }
+        .profile-pic img {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #f5c542;
+        }
+        .post {
+            background: rgba(255,255,255,0.05);
+            border-left: 4px solid #f5c542;
+            padding: 18px;
+            margin-bottom: 25px;
+            border-radius: 12px;
+        }
+        .post-date {
+            font-size: 0.8rem;
+            color: #e0b354;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        .post-message {
+            font-size: 1.25rem;
+            line-height: 1.4;
+            margin: 10px 0;
+        }
+        .post-author {
+            text-align: right;
+            font-size: 0.9rem;
+            color: #e0b354;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(245,197,66,0.3);
+            font-size: 0.8rem;
+        }
+        @media (max-width: 600px) {
+            h1 { font-size: 1.5rem; }
+            .profile-pic img { width: 140px; height: 140px; }
+            .post-message { font-size: 1rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="welcome">✨ Welcome to home of inspirations and motivations ✨</div>
+    <h1>God's plan Emmanuel<br>Inspirational/Motivational quotes</h1>
+    <div class="profile-pic">
+        <img src="emmanuel.jpg" alt="Nana Emma">
+    </div>
+    <div id="postsContainer">
+        <div style="text-align:center; padding:40px;">🌟 Loading daily inspiration... 🌟</div>
+    </div>
+    <footer>© 2025 God's Plan Emmanuel | Share positivity daily</footer>
+</div>
+<script>
+    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTJETL_5sSOAwqSVSfefmpqOjyS_Az3h9a9AZTjm6TuAqWwluEg_LfkML5YbdBzaHttWJmFTqtEqGFz/pub?output=csv";
+    const ADMIN_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSe_BaPQOsGkHfnBlEdY5RREhtzbJebELvIawgXkXbrU2hswNw/viewform?usp=header";
+    let posts = [];
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
+    }
+    function renderPosts() {
+        const container = document.getElementById('postsContainer');
+        if (!posts.length) {
+            container.innerHTML = '<div class="post">No posts yet. Check back soon!</div>';
+            return;
+        }
+        let html = '';
+        for (let p of posts) {
+            html += `
+                <div class="post">
+                    <div class="post-date">📅 ${escapeHtml(p.date)}</div>
+                    <div class="post-message">“${escapeHtml(p.message)}”</div>
+                    <div class="post-author">— Nana Emma</div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+    }
+    function savePostsToCache(postsArray) {
+        try { localStorage.setItem('cachedPosts', JSON.stringify(postsArray)); } catch(e) {}
+    }
+    function loadCachedPosts() {
+        const cached = localStorage.getItem('cachedPosts');
+        if (cached) {
+            try {
+                const parsed = JSON.parse(cached);
+                if (parsed.length) { posts = parsed; renderPosts(); }
+            } catch(e) {}
+        }
+    }
+    async function fetchNewPosts() {
+        try {
+            const response = await fetch(CSV_URL);
+            if (!response.ok) throw new Error();
+            const csvText = await response.text();
+            const rows = csvText.split('\n').filter(row => row.trim() !== '');
+            if (rows.length < 2) return;
+            const newPosts = [];
+            for (let i = 1; i < rows.length; i++) {
+                let row = rows[i];
+                let firstComma = row.indexOf(',');
+                let secondComma = row.indexOf(',', firstComma+1);
+                let timestamp = row.substring(0, firstComma).replace(/^"|"$/g, '');
+                let message = (secondComma === -1) ? row.substring(firstComma+1).replace(/^"|"$/g, '') : row.substring(firstComma+1, secondComma).replace(/^"|"$/g, '');
+                if (message.trim() !== "") {
+                    let datePart = timestamp.split(' ')[0];
+                    newPosts.push({ date: datePart, message: message.trim() });
+                }
+            }
+            newPosts.reverse();
+            if (newPosts.length) {
+                posts = newPosts;
+                renderPosts();
+                savePostsToCache(posts);
+            }
+        } catch (err) { console.log("Fetch failed, using cache."); }
+    }
+    if (window.location.search.includes('admin=true')) {
+        let pwd = prompt("Enter admin password:");
+        if (pwd === "admin123") {
+            alert("Copy this link to post new quotes:\n" + ADMIN_FORM_URL);
+            window.open(ADMIN_FORM_URL, '_blank');
+        } else if (pwd !== null) {
+            alert("Wrong password");
+        }
+    }
+    loadCachedPosts();
+    fetchNewPosts();
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW failed', err));
+    }
+</script>
+</body>
+</html>
