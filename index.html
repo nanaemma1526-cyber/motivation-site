@@ -7,7 +7,7 @@
     <meta name="description" content="Birthday wishes, motivation, African proverbs, and biblical quotes">
     <meta name="theme-color" content="#050914">
     <link rel="manifest" href="manifest.json">
-    <!-- PapaParse for robust CSV parsing -->
+    <!-- PapaParse for reliable CSV parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         * {
@@ -17,8 +17,6 @@
         }
 
         body {
-            /* Elegant dark blue radial gradient background with a subtle overlay */
-            min-height: 100vh;
             background: radial-gradient(ellipse at top, #0f172a, #020617), 
                         repeating-radial-gradient(circle at 30% 40%, rgba(255,215,0,0.02) 0px, rgba(255,215,0,0.02) 2px, transparent 2px, transparent 8px);
             background-blend-mode: overlay;
@@ -34,32 +32,29 @@
             padding: 20px;
         }
 
-        /* ===== Improved Typography & Elements ===== */
-        h1, h2, h3 {
-            font-weight: 600;
-            letter-spacing: -0.02em;
+        .welcome-screen {
+            text-align: center;
         }
 
-        .welcome-text {
-            font-size: 1.75rem;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.3);
-        }
-
-        /* ===== Welcome Screen ===== */
-        .welcome-screen { text-align: center; }
-        
         .profile-pic img {
             width: 180px;
             height: 180px;
             border-radius: 50%;
             object-fit: cover;
             border: 3px solid #f5b042;
-            box-shadow: 0 8px 25px rgba(0,0,0,0.4), 0 0 15px rgba(245,176,66,0.3);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
+
         .profile-pic img:hover {
             transform: scale(1.02);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(245,176,66,0.5);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(245, 176, 66, 0.3);
+        }
+
+        .welcome-text {
+            font-size: 1.75rem;
+            margin: 20px 0;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
 
         .continue-btn {
@@ -72,54 +67,58 @@
             border-radius: 40px;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             margin-top: 30px;
         }
+
         .continue-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.25);
             background: linear-gradient(135deg, #f5c542, #e6b422);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
         }
 
-        /* ===== Menu Screen (Cards) ===== */
-        .menu-screen, .quotes-screen { display: none; }
-        
+        .menu-screen,
+        .quotes-screen {
+            display: none;
+        }
+
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 25px;
             margin-top: 40px;
         }
-        
+
         .card {
             background: rgba(15, 25, 45, 0.65);
             backdrop-filter: blur(12px) saturate(160%);
-            -webkit-backdrop-filter: blur(12px) saturate(160%);
             border: 1px solid rgba(245, 197, 66, 0.3);
             border-radius: 24px;
             padding: 35px 20px;
             text-align: center;
             cursor: pointer;
             transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
+
         .card:hover {
             transform: translateY(-8px);
             background: rgba(20, 30, 50, 0.8);
-            border: 1px solid rgba(245, 197, 66, 0.8);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.4), 0 0 12px rgba(245,197,66,0.3);
+            border-color: rgba(245, 197, 66, 0.8);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 12px rgba(245, 197, 66, 0.3);
         }
+
         .card h3 {
-            margin-bottom: 12px;
             font-size: 1.6rem;
+            margin-bottom: 12px;
             color: #f5c542;
         }
+
         .card p {
             color: #e0b354;
             font-size: 0.95rem;
         }
 
-        /* ===== Quotes Screen (Posts) ===== */
         .back-btn {
             background: rgba(20, 30, 50, 0.7);
             border: 1px solid #f5b042;
@@ -131,11 +130,12 @@
             font-weight: 500;
             transition: all 0.2s ease;
         }
+
         .back-btn:hover {
             background: rgba(245, 197, 66, 0.2);
             border-color: #f5c542;
         }
-        
+
         h2#categoryTitle {
             text-align: center;
             margin-bottom: 30px;
@@ -147,7 +147,7 @@
             display: inline-block;
             width: 100%;
         }
-        
+
         .post {
             background: rgba(10, 15, 35, 0.7);
             backdrop-filter: blur(8px);
@@ -156,13 +156,15 @@
             margin-bottom: 25px;
             border-radius: 16px;
             transition: all 0.25s ease;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
+
         .post:hover {
             transform: translateX(6px);
             background: rgba(20, 30, 50, 0.8);
             border-left-width: 6px;
         }
+
         .post-date {
             font-size: 0.8rem;
             color: #f5b042;
@@ -170,6 +172,7 @@
             font-weight: bold;
             letter-spacing: 0.5px;
         }
+
         .post-message {
             font-size: 1.25rem;
             line-height: 1.5;
@@ -178,13 +181,14 @@
             word-wrap: break-word;
             font-weight: 400;
         }
+
         .post-author {
             text-align: right;
             font-size: 0.9rem;
             color: #e0b354;
             margin-top: 12px;
             font-style: italic;
-            border-top: 1px dashed rgba(245,197,66,0.3);
+            border-top: 1px dashed rgba(245, 197, 66, 0.3);
             padding-top: 8px;
         }
 
@@ -192,17 +196,28 @@
             text-align: center;
             margin-top: 70px;
             padding-top: 20px;
-            border-top: 1px solid rgba(245,197,66,0.2);
+            border-top: 1px solid rgba(245, 197, 66, 0.2);
             font-size: 0.8rem;
             color: #c9a03d;
         }
-        
+
         @media (max-width: 600px) {
-            .welcome-text { font-size: 1.3rem; }
-            .profile-pic img { width: 140px; height: 140px; }
-            .post-message { font-size: 1rem; }
-            .cards-grid { gap: 15px; }
-            .card { padding: 25px 15px; }
+            .welcome-text {
+                font-size: 1.3rem;
+            }
+            .profile-pic img {
+                width: 140px;
+                height: 140px;
+            }
+            .post-message {
+                font-size: 1rem;
+            }
+            .cards-grid {
+                gap: 15px;
+            }
+            .card {
+                padding: 25px 15px;
+            }
         }
     </style>
 </head>
@@ -210,7 +225,9 @@
 <div class="container">
     <!-- WELCOME SCREEN -->
     <div id="welcomeScreen" class="welcome-screen">
-        <div class="profile-pic"><img src="emmanuel.jpg" alt="Nana Emma"></div>
+        <div class="profile-pic">
+            <img src="emmanuel.jpg" alt="Nana Emma">
+        </div>
         <div class="welcome-text">✨ Welcome to home of inspirations and motivations ✨</div>
         <button class="continue-btn" id="continueBtn">Continue →</button>
     </div>
@@ -218,10 +235,22 @@
     <!-- MENU SCREEN -->
     <div id="menuScreen" class="menu-screen">
         <div class="cards-grid">
-            <div class="card" data-category="birthday"><h3>🎂 Birthday wishes</h3><p>Send special birthday blessings</p></div>
-            <div class="card" data-category="motivational"><h3>💪 Motivational/Inspirational</h3><p>Daily words to lift your spirit</p></div>
-            <div class="card" data-category="proverbs"><h3>🌍 African Proverbs</h3><p>Wisdom from the ancestors</p></div>
-            <div class="card" data-category="biblical"><h3>📖 Biblical quotes</h3><p>Scripture for strength</p></div>
+            <div class="card" data-category="birthday">
+                <h3>🎂 Birthday wishes</h3>
+                <p>Send special birthday blessings</p>
+            </div>
+            <div class="card" data-category="motivational">
+                <h3>💪 Motivational/Inspirational</h3>
+                <p>Daily words to lift your spirit</p>
+            </div>
+            <div class="card" data-category="proverbs">
+                <h3>🌍 African Proverbs</h3>
+                <p>Wisdom from the ancestors</p>
+            </div>
+            <div class="card" data-category="biblical">
+                <h3>📖 Biblical quotes</h3>
+                <p>Scripture for strength</p>
+            </div>
         </div>
         <footer>Choose a category to explore</footer>
     </div>
@@ -229,20 +258,24 @@
     <!-- QUOTES SCREEN -->
     <div id="quotesScreen" class="quotes-screen">
         <button class="back-btn" id="backToMenuBtn">← Back to menu</button>
-        <div style="text-align: center;"><h2 id="categoryTitle"></h2></div>
+        <div style="text-align: center;">
+            <h2 id="categoryTitle"></h2>
+        </div>
         <div id="quotesContainer"></div>
     </div>
 </div>
 
 <script>
-    // ==================== YOUR CSV LINKS (FULLY UPDATED) ====================
+    // ==================== ALL CSV LINKS ARE CORRECTLY INSERTED ====================
     const CSV_LINKS = {
         birthday: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSobQavQFqfcKBScUtaU2jFC4voRiudfc5nIsqGgo5v6ozEfhYT4MC4r_UYIcXYLR8XBw12nonnNKsI/pub?output=csv",
         motivational: "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1ONrAo95j-RHUpXVoFqHfs-q2hE2hZAlsF2i69gKmhvUanDh20hFCRGw55M59bqiDXZ1ilV-AyTna/pub?output=csv",
-        proverbs: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRCwGKC4wGBtjHr0YtflDsJf9yyywQHGTqFxrFv12mDnw6S9T85jBkaYn20SL1BMJO2pQiEjPR9rX8C/pub?output=csv",
-        biblical: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTJETL_5sSOAwqSVSfefmpqOjyS_Az3h9a9AZTjm6TuAqWwluEg_LfkML5YbdBzaHttWJmFTqtEqGFz/pub?output=csv"
+        proverbs: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgXScNF1wk8MxWahiFRf_mBStqYB4mLd1LKRcY16zL86BZbYu-RpzLxGNoTU5MOynQrwMj7elSiouH/pub?output=csv",
+        biblical: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRCwGKC4wGBtjHr0YtflDsJf9yyywQHGTqFxrFv12mDnw6S9T85jBkaYn20SL1BMJO2pQiEjPR9rX8C/pub?output=csv"
     };
+
     const ADMIN_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSe_BaPQOsGkHfnBlEdY5RREhtzbJebELvIawgXkXbrU2hswNw/viewform?usp=header";
+
     const categoryNames = {
         birthday: "🎂 Birthday Wishes",
         motivational: "💪 Motivational & Inspirational Quotes",
@@ -258,24 +291,30 @@
 
     function escapeHtml(str) {
         if (!str) return '';
-        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        });
     }
 
     async function loadQuotes(category) {
         quotesContainer.innerHTML = '<div style="text-align:center; padding:40px;">🌟 Loading quotes... 🌟</div>';
         const csvUrl = CSV_LINKS[category];
         if (!csvUrl || csvUrl.includes('YOUR_')) {
-            quotesContainer.innerHTML = '<div class="post">CSV link not set. Please replace the placeholder with your actual Google Sheets CSV link.</div>';
+            quotesContainer.innerHTML = '<div class="post">CSV link not set. Please check the link.</div>';
             return;
         }
         try {
             const response = await fetch(csvUrl);
+            if (!response.ok) throw new Error();
             const csvText = await response.text();
             const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
             if (parsed.errors.length) console.warn(parsed.errors);
             const rows = parsed.data;
             if (!rows.length) {
-                quotesContainer.innerHTML = '<div class="post">No quotes in this category yet. Check back soon!</div>';
+                quotesContainer.innerHTML = '<div class="post">No quotes in this category yet.</div>';
                 return;
             }
             // Find columns (case-insensitive)
@@ -287,7 +326,7 @@
                 if (lower.includes('quote') || lower.includes('message') || lower.includes('motivational')) quoteCol = key;
                 if (lower.includes('author')) authorCol = key;
             }
-            if (!quoteCol) quoteCol = Object.keys(firstRow)[1]; // fallback to second column
+            if (!quoteCol) quoteCol = Object.keys(firstRow)[1];
             if (!timestampCol) timestampCol = Object.keys(firstRow)[0];
             const quotes = [];
             for (let row of rows) {
@@ -298,7 +337,7 @@
                 let datePart = timestamp.split(' ')[0];
                 quotes.push({ date: datePart, message: message, author: author });
             }
-            quotes.reverse(); // newest first
+            quotes.reverse();
             if (!quotes.length) {
                 quotesContainer.innerHTML = '<div class="post">No quotes found in this category.</div>';
                 return;
@@ -320,6 +359,7 @@
         }
     }
 
+    // Navigation
     document.getElementById('continueBtn').onclick = () => {
         welcomeScreen.style.display = 'none';
         menuScreen.style.display = 'block';
@@ -343,12 +383,15 @@
     menuScreen.style.display = 'none';
     quotesScreen.style.display = 'none';
 
+    // Hidden admin access (using secret ?admin=true)
     if (window.location.search.includes('admin=true')) {
         let pwd = prompt("Enter admin password:");
         if (pwd === "admin123") {
             alert("Copy this link to post new quotes:\n" + ADMIN_FORM_URL);
             window.open(ADMIN_FORM_URL, '_blank');
-        } else if (pwd !== null) alert("Wrong password");
+        } else if (pwd !== null) {
+            alert("Wrong password");
+        }
     }
 </script>
 </body>
