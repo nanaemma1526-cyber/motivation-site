@@ -5,5 +5,17 @@
   "display": "standalone",
   "background_color": "#0a0f2a",
   "theme_color": "#0a0f2a",
-  "description": "Daily motivational quotes by Nana Emma"
+  "description": "Daily motivational quotes by Nana Emma",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
 }
