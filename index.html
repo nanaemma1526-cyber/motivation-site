@@ -94,7 +94,7 @@
     // ============================================================
     const CSV_LINKS = {
         birthday: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSobQavQFqfcKBScUtaU2jFC4voRiudfc5nIsqGgo5v6ozEfhYT4MC4r_UYIcXYLR8XBw12nonnNKsI/pub?output=csv",
-        motivational: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgXScNF1wk8MxWahiFRf_mBStqYB4mLd1LKRcY16zL86BZbYu-RpzLxGNoTU5MOynQrwMj7elSiouH/pub?output=csv",
+        motivational: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgXScNF1wk8MxWahiFRf_mBStqYB4mL1dLKRcY16zL86BZbYu-RpzLxGNoTU5MOynQrwMj7elSiouH/pub?output=csv",
         proverbs: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRCwGKC4wGBtjHr0YtflDsJf9yyywQHGTqFxrFv12mDnw6S9T85jBkaYn20SL1BMJO2pQiEjPR9rX8C/pub?output=csv",
         biblical: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTJETL_5sSOAwqSVSfefmpqOjyS_Az3h9a9AZTjm6TuAqWwluEg_LfkML5YbdBzaHttWJmFTqtEqGFz/pub?output=csv"
     };
@@ -121,83 +121,73 @@
         return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
     }
 
-    // Safe CSV parser that handles commas inside quoted fields
-async function loadQuotes(category) {
-    quotesContainer.innerHTML = '<div style="text-align:center; padding:40px;">🌟 Loading quotes... 🌟</div>';
-    const csvUrl = CSV_LINKS[category];
-    if (!csvUrl || csvUrl.includes('YOUR_')) {
-        quotesContainer.innerHTML = '<div class="post">CSV link not set. Please replace the placeholder with your actual Google Sheets CSV link.</div>';
-        return;
-    }
-    try {
-        const response = await fetch(csvUrl);
-        if (!response.ok) throw new Error();
-        const csvText = await response.text();
-        const lines = csvText.split('\n').filter(line => line.trim() !== '');
-        if (lines.length < 2) {
-            quotesContainer.innerHTML = '<div class="post">No quotes in this category yet. Check back soon!</div>';
+    // Safe CSV parser with fixed column indices (matching your sheet: index1=timestamp, index2=quote, index3=author)
+    async function loadQuotes(category) {
+        quotesContainer.innerHTML = '<div style="text-align:center; padding:40px;">🌟 Loading quotes... 🌟</div>';
+        const csvUrl = CSV_LINKS[category];
+        if (!csvUrl || csvUrl.includes('YOUR_')) {
+            quotesContainer.innerHTML = '<div class="post">CSV link not set. Please replace the placeholder with your actual Google Sheets CSV link.</div>';
             return;
         }
-        // Parse headers to find column indices
-        const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim());
-        let timestampIdx = -1, quoteIdx = -1, authorIdx = -1;
-        for (let i = 0; i < headers.length; i++) {
-            const h = headers[i].toLowerCase();
-            if (h.includes('timestamp') || h.includes('date')) timestampIdx = i;
-            if (h.includes('quote') || h.includes('message') || h.includes('motivational')) quoteIdx = i;
-            if (h.includes('author')) authorIdx = i;
-        }
-        if (quoteIdx === -1) quoteIdx = 1; // fallback
-        if (timestampIdx === -1) timestampIdx = 0;
-        if (authorIdx === -1) authorIdx = 2;
+        try {
+            const response = await fetch(csvUrl);
+            if (!response.ok) throw new Error();
+            const csvText = await response.text();
+            const lines = csvText.split('\n').filter(line => line.trim() !== '');
+            if (lines.length < 2) {
+                quotesContainer.innerHTML = '<div class="post">No quotes in this category yet. Check back soon!</div>';
+                return;
+            }
+            const TIMESTAMP_IDX = 1;
+            const QUOTE_IDX = 2;
+            const AUTHOR_IDX = 3;
 
-        const quotes = [];
-        // Use regex to parse each CSV line (handles quoted commas)
-        const regex = /(".?"|[^,])(,|$)/g;
-        for (let i = 1; i < lines.length; i++) {
-            const line = lines[i].trim();
-            if (line === '') continue;
-            const fields = [];
-            let match;
-            while ((match = regex.exec(line)) !== null) {
-                if (match[1] !== undefined) {
-                    let field = match[1].replace(/^"|"$/g, '');
-                    fields.push(field);
+            const quotes = [];
+            const regex = /(".?"|[^,])(,|$)/g;
+            for (let i = 1; i < lines.length; i++) { // skip header row
+                const line = lines[i].trim();
+                if (line === '') continue;
+                const fields = [];
+                let match;
+                while ((match = regex.exec(line)) !== null) {
+                    if (match[1] !== undefined) {
+                        let field = match[1].replace(/^"|"$/g, '');
+                        fields.push(field);
+                    }
+                    if (match[2] === '') break;
                 }
-                if (match[2] === '') break;
-            }
-            regex.lastIndex = 0;
-            if (fields.length > Math.max(timestampIdx, quoteIdx, authorIdx)) {
-                let timestamp = fields[timestampIdx] || '';
-                let message = fields[quoteIdx] || '';
-                let author = (authorIdx >= 0 && fields[authorIdx]) ? fields[authorIdx] : "Nana Emma";
-                const datePart = timestamp.split(' ')[0];
-                if (message.trim() !== "") {
-                    quotes.push({ date: datePart, message: message.trim(), author: author.trim() });
+                regex.lastIndex = 0;
+                if (fields.length > QUOTE_IDX) {
+                    let timestamp = fields[TIMESTAMP_IDX] || '';
+                    let message = fields[QUOTE_IDX] || '';
+                    let author = (fields.length > AUTHOR_IDX && fields[AUTHOR_IDX].trim() !== '') ? fields[AUTHOR_IDX] : "Nana Emma";
+                    const datePart = timestamp.split(' ')[0];
+                    if (message.trim() !== "") {
+                        quotes.push({ date: datePart, message: message.trim(), author: author.trim() });
+                    }
                 }
             }
+            quotes.reverse(); // newest first
+            if (quotes.length === 0) {
+                quotesContainer.innerHTML = '<div class="post">No quotes in this category yet. Check back soon!</div>';
+                return;
+            }
+            let html = '';
+            for (let q of quotes) {
+                html += `
+                    <div class="post">
+                        <div class="post-date">📅 ${escapeHtml(q.date)}</div>
+                        <div class="post-message">“${escapeHtml(q.message)}”</div>
+                        <div class="post-author">— ${escapeHtml(q.author)}</div>
+                    </div>
+                `;
+            }
+            quotesContainer.innerHTML = html;
+        } catch (err) {
+            console.error(err);
+            quotesContainer.innerHTML = '<div class="post">Unable to load quotes. Please check the CSV link or network.</div>';
         }
-        quotes.reverse();
-        if (quotes.length === 0) {
-            quotesContainer.innerHTML = '<div class="post">No quotes in this category yet. Check back soon!</div>';
-            return;
-        }
-        let html = '';
-        for (let q of quotes) {
-            html += `
-                <div class="post">
-                    <div class="post-date">📅 ${escapeHtml(q.date)}</div>
-                    <div class="post-message">“${escapeHtml(q.message)}”</div>
-                    <div class="post-author">— ${escapeHtml(q.author)}</div>
-                </div>
-            `;
-        }
-        quotesContainer.innerHTML = html;
-    } catch (err) {
-        console.error(err);
-        quotesContainer.innerHTML = '<div class="post">Unable to load quotes. Please check the CSV link or network.</div>';
     }
-}
 
     // Navigation
     document.getElementById('continueBtn').addEventListener('click', () => {
@@ -227,7 +217,7 @@ async function loadQuotes(category) {
     menuScreen.style.display = 'none';
     quotesScreen.style.display = 'none';
 
-    // Optional hidden admin access (using secret ?admin=true)
+    // Hidden admin access (using secret ?admin=true)
     if (window.location.search.includes('admin=true')) {
         let pwd = prompt("Enter admin password:");
         if (pwd === "admin123") {
