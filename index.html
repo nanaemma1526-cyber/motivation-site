@@ -7,6 +7,8 @@
     <meta name="description" content="Birthday wishes, motivation, African proverbs, and biblical quotes">
     <meta name="theme-color" content="#0a0f2a">
     <link rel="manifest" href="manifest.json">
+    <!-- PapaParse library for reliable CSV parsing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -62,14 +64,11 @@
 </head>
 <body>
 <div class="container">
-    <!-- WELCOME SCREEN -->
     <div id="welcomeScreen" class="welcome-screen">
         <div class="profile-pic"><img src="emmanuel.jpg" alt="Nana Emma"></div>
         <div class="welcome-text">✨ Welcome to home of inspirations and motivations ✨</div>
         <button class="continue-btn" id="continueBtn">Continue →</button>
     </div>
-
-    <!-- MENU SCREEN -->
     <div id="menuScreen" class="menu-screen">
         <div class="cards-grid">
             <div class="card" data-category="birthday"><h3>🎂 Birthday wishes</h3><p>Send special birthday blessings</p></div>
@@ -79,29 +78,21 @@
         </div>
         <footer>Choose a category to explore</footer>
     </div>
-
-    <!-- QUOTES SCREEN -->
     <div id="quotesScreen" class="quotes-screen">
         <button class="back-btn" id="backToMenuBtn">← Back to menu</button>
         <h2 id="categoryTitle"></h2>
         <div id="quotesContainer"></div>
     </div>
 </div>
-
 <script>
-    // ============================================================
-    // YOUR FOUR CSV LINKS (published Google Sheets as .csv)
-    // ============================================================
+    // Your CSV links (same as before)
     const CSV_LINKS = {
         birthday: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSobQavQFqfcKBScUtaU2jFC4voRiudfc5nIsqGgo5v6ozEfhYT4MC4r_UYIcXYLR8XBw12nonnNKsI/pub?output=csv",
         motivational: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgXScNF1wk8MxWahiFRf_mBStqYB4mL1dLKRcY16zL86BZbYu-RpzLxGNoTU5MOynQrwMj7elSiouH/pub?output=csv",
         proverbs: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRCwGKC4wGBtjHr0YtflDsJf9yyywQHGTqFxrFv12mDnw6S9T85jBkaYn20SL1BMJO2pQiEjPR9rX8C/pub?output=csv",
         biblical: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTJETL_5sSOAwqSVSfefmpqOjyS_Az3h9a9AZTjm6TuAqWwluEg_LfkML5YbdBzaHttWJmFTqtEqGFz/pub?output=csv"
     };
-
-    // Admin Google Form link (for you to post quotes daily – never shown to public)
     const ADMIN_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSe_BaPQOsGkHfnBlEdY5RREhtzbJebELvIawgXkXbrU2hswNw/viewform?usp=header";
-
     const categoryNames = {
         birthday: "🎂 Birthday Wishes",
         motivational: "💪 Motivational & Inspirational Quotes",
@@ -109,7 +100,6 @@
         biblical: "📖 Biblical Quotes"
     };
 
-    // DOM elements
     const welcomeScreen = document.getElementById('welcomeScreen');
     const menuScreen = document.getElementById('menuScreen');
     const quotesScreen = document.getElementById('quotesScreen');
@@ -121,55 +111,48 @@
         return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
     }
 
-    // Safe CSV parser with fixed column indices (matching your sheet: index1=timestamp, index2=quote, index3=author)
     async function loadQuotes(category) {
         quotesContainer.innerHTML = '<div style="text-align:center; padding:40px;">🌟 Loading quotes... 🌟</div>';
         const csvUrl = CSV_LINKS[category];
         if (!csvUrl || csvUrl.includes('YOUR_')) {
-            quotesContainer.innerHTML = '<div class="post">CSV link not set. Please replace the placeholder with your actual Google Sheets CSV link.</div>';
+            quotesContainer.innerHTML = '<div class="post">CSV link not set.</div>';
             return;
         }
         try {
             const response = await fetch(csvUrl);
-            if (!response.ok) throw new Error();
             const csvText = await response.text();
-            const lines = csvText.split('\n').filter(line => line.trim() !== '');
-            if (lines.length < 2) {
-                quotesContainer.innerHTML = '<div class="post">No quotes in this category yet. Check back soon!</div>';
+            // Use PapaParse to reliably parse CSV
+            const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
+            if (parsed.errors.length) console.warn(parsed.errors);
+            const rows = parsed.data;
+            if (!rows.length) {
+                quotesContainer.innerHTML = '<div class="post">No quotes in this category yet.</div>';
                 return;
             }
-            const TIMESTAMP_IDX = 1;
-            const QUOTE_IDX = 2;
-            const AUTHOR_IDX = 3;
+            // Find the columns we need (case-insensitive)
+            const firstRow = rows[0];
+            let timestampCol = null, quoteCol = null, authorCol = null;
+            for (let key in firstRow) {
+                let lower = key.toLowerCase();
+                if (lower.includes('timestamp') || lower.includes('date')) timestampCol = key;
+                if (lower.includes('quote') || lower.includes('message') || lower.includes('motivational')) quoteCol = key;
+                if (lower.includes('author')) authorCol = key;
+            }
+            if (!quoteCol) quoteCol = Object.keys(firstRow)[1]; // fallback to second column
+            if (!timestampCol) timestampCol = Object.keys(firstRow)[0]; // fallback to first column
 
             const quotes = [];
-            const regex = /(".?"|[^,])(,|$)/g;
-            for (let i = 1; i < lines.length; i++) { // skip header row
-                const line = lines[i].trim();
-                if (line === '') continue;
-                const fields = [];
-                let match;
-                while ((match = regex.exec(line)) !== null) {
-                    if (match[1] !== undefined) {
-                        let field = match[1].replace(/^"|"$/g, '');
-                        fields.push(field);
-                    }
-                    if (match[2] === '') break;
-                }
-                regex.lastIndex = 0;
-                if (fields.length > QUOTE_IDX) {
-                    let timestamp = fields[TIMESTAMP_IDX] || '';
-                    let message = fields[QUOTE_IDX] || '';
-                    let author = (fields.length > AUTHOR_IDX && fields[AUTHOR_IDX].trim() !== '') ? fields[AUTHOR_IDX] : "Nana Emma";
-                    const datePart = timestamp.split(' ')[0];
-                    if (message.trim() !== "") {
-                        quotes.push({ date: datePart, message: message.trim(), author: author.trim() });
-                    }
-                }
+            for (let row of rows) {
+                let message = row[quoteCol]?.trim();
+                if (!message) continue;
+                let timestamp = row[timestampCol] || '';
+                let author = authorCol ? (row[authorCol]?.trim() || "Nana Emma") : "Nana Emma";
+                let datePart = timestamp.split(' ')[0];
+                quotes.push({ date: datePart, message: message, author: author });
             }
             quotes.reverse(); // newest first
-            if (quotes.length === 0) {
-                quotesContainer.innerHTML = '<div class="post">No quotes in this category yet. Check back soon!</div>';
+            if (!quotes.length) {
+                quotesContainer.innerHTML = '<div class="post">No quotes found.</div>';
                 return;
             }
             let html = '';
@@ -185,47 +168,39 @@
             quotesContainer.innerHTML = html;
         } catch (err) {
             console.error(err);
-            quotesContainer.innerHTML = '<div class="post">Unable to load quotes. Please check the CSV link or network.</div>';
+            quotesContainer.innerHTML = '<div class="post">Unable to load quotes. Check network or CSV link.</div>';
         }
     }
 
-    // Navigation
-    document.getElementById('continueBtn').addEventListener('click', () => {
+    document.getElementById('continueBtn').onclick = () => {
         welcomeScreen.style.display = 'none';
         menuScreen.style.display = 'block';
         quotesScreen.style.display = 'none';
-    });
-
-    document.getElementById('backToMenuBtn').addEventListener('click', () => {
+    };
+    document.getElementById('backToMenuBtn').onclick = () => {
         menuScreen.style.display = 'block';
         quotesScreen.style.display = 'none';
         quotesContainer.innerHTML = '';
-    });
-
+    };
     document.querySelectorAll('.card').forEach(card => {
-        card.addEventListener('click', () => {
+        card.onclick = () => {
             const category = card.getAttribute('data-category');
-            categoryTitle.innerText = categoryNames[category] || 'Quotes';
+            categoryTitle.innerText = categoryNames[category];
             menuScreen.style.display = 'none';
             quotesScreen.style.display = 'block';
             loadQuotes(category);
-        });
+        };
     });
-
-    // Initial state
     welcomeScreen.style.display = 'block';
     menuScreen.style.display = 'none';
     quotesScreen.style.display = 'none';
 
-    // Hidden admin access (using secret ?admin=true)
     if (window.location.search.includes('admin=true')) {
         let pwd = prompt("Enter admin password:");
         if (pwd === "admin123") {
             alert("Copy this link to post new quotes:\n" + ADMIN_FORM_URL);
             window.open(ADMIN_FORM_URL, '_blank');
-        } else if (pwd !== null) {
-            alert("Wrong password");
-        }
+        } else if (pwd !== null) alert("Wrong password");
     }
 </script>
 </body>
