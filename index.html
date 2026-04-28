@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>God's Plan Emmanuel | Daily Motivation</title>
-    <meta name="description" content="Daily motivational and inspirational quotes by God's Plan Emmanuel.">
+    <title>God's Plan Emmanuel | Inspirational Hub</title>
+    <meta name="description" content="Birthday wishes, motivation, African proverbs, and biblical quotes">
     <meta name="theme-color" content="#0a0f2a">
     <link rel="manifest" href="manifest.json">
     <style>
@@ -21,156 +21,196 @@
             margin: 0 auto;
             padding: 20px;
         }
-        .welcome {
-            text-align: center;
-            font-size: 1.2rem;
-            margin-bottom: 20px;
-            font-style: italic;
-            border-bottom: 1px solid #f5c542;
-            display: inline-block;
-            width: 100%;
-            padding-bottom: 10px;
-        }
-        h1 {
-            text-align: center;
-            font-size: 2rem;
-            margin: 20px 0 10px;
-            color: #f5c542;
-        }
-        .profile-pic {
-            text-align: center;
-            margin: 20px 0 30px;
-        }
+        .welcome-screen { text-align: center; }
         .profile-pic img {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #f5c542;
+            width: 180px; height: 180px; border-radius: 50%;
+            object-fit: cover; border: 3px solid #f5c542;
+            margin-bottom: 20px;
         }
+        .welcome-text { font-size: 1.5rem; margin: 20px 0; }
+        .continue-btn {
+            background: #f5c542; color: #0a0f2a; border: none;
+            padding: 12px 30px; font-size: 1.2rem; border-radius: 30px;
+            cursor: pointer; font-weight: bold; margin-top: 20px;
+        }
+        .menu-screen, .quotes-screen { display: none; }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px; margin-top: 30px;
+        }
+        .card {
+            background: rgba(255,255,255,0.05); border: 1px solid #f5c542;
+            border-radius: 16px; padding: 30px 20px; text-align: center;
+            cursor: pointer; transition: all 0.3s ease;
+        }
+        .card:hover { background: rgba(245,197,66,0.1); transform: translateY(-5px); }
+        .card h3 { margin-bottom: 10px; }
         .post {
-            background: rgba(255,255,255,0.05);
-            border-left: 4px solid #f5c542;
-            padding: 18px;
-            margin-bottom: 25px;
-            border-radius: 12px;
-            overflow: visible;
-            height:  auto;
+            background: rgba(255,255,255,0.05); border-left: 4px solid #f5c542;
+            padding: 18px; margin-bottom: 25px; border-radius: 12px;
         }
-        .post-date {
-            font-size: 0.8rem;
-            color: #e0b354;
-            margin-bottom: 8px;
-            font-weight: bold;
+        .post-date { font-size: 0.8rem; color: #e0b354; margin-bottom: 8px; font-weight: bold; }
+        .post-message { font-size: 1.25rem; line-height: 1.4; margin: 10px 0; white-space: normal; word-wrap: break-word; }
+        .post-author { text-align: right; font-size: 0.9rem; color: #e0b354; margin-top: 10px; font-style: italic; }
+        .back-btn {
+            background: none; border: 1px solid #f5c542; color: #f5c542;
+            padding: 6px 12px; border-radius: 20px; cursor: pointer; margin-bottom: 20px;
         }
-        .post-message {
-            font-size: 1.25rem;
-            line-height: 1.4;
-            margin: 10px 0;
-            word-wrap:  break-word;
-            white-space: normal;
-            overflow:  visible;
-            height: auto !important;
-            min-height: auto;
-        }
-        .post-author {
-            text-align: right;
-            font-size: 0.9rem;
-            color: #e0b354;
-            margin-top: 10px;
-            font-style: italic;
-        }
-        footer {
-            text-align: center;
-            margin-top: 50px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(245,197,66,0.3);
-            font-size: 0.8rem;
-        }
-        @media (max-width: 600px) {
-            h1 { font-size: 1.5rem; }
-            .profile-pic img { width: 140px; height: 140px; }
-            .post-message { font-size: 1rem; }
-        }
+        footer { text-align: center; margin-top: 50px; font-size: 0.8rem; color: #e0b354; }
     </style>
 </head>
 <body>
 <div class="container">
-    <div class="welcome">✨ Welcome to home of inspirations and motivations ✨</div>
-    <h1>God's plan Emmanuel<br>Inspirational/Motivational quotes</h1>
-    <div class="profile-pic">
-        <img src="emmanuel.jpg" alt="Nana Emma">
+    <!-- WELCOME SCREEN -->
+    <div id="welcomeScreen" class="welcome-screen">
+        <div class="profile-pic"><img src="emmanuel.jpg" alt="Nana Emma"></div>
+        <div class="welcome-text">✨ Welcome to home of inspirations and motivations ✨</div>
+        <button class="continue-btn" id="continueBtn">Continue →</button>
     </div>
-    <div id="postsContainer">
-        <div style="text-align:center; padding:40px;">🌟 Loading daily inspiration... 🌟</div>
+
+    <!-- MENU SCREEN -->
+    <div id="menuScreen" class="menu-screen">
+        <div class="cards-grid">
+            <div class="card" data-category="birthday"><h3>🎂 Birthday wishes</h3><p>Send special birthday blessings</p></div>
+            <div class="card" data-category="motivational"><h3>💪 Motivational/Inspirational</h3><p>Daily words to lift your spirit</p></div>
+            <div class="card" data-category="proverbs"><h3>🌍 African Proverbs</h3><p>Wisdom from the ancestors</p></div>
+            <div class="card" data-category="biblical"><h3>📖 Biblical quotes</h3><p>Scripture for strength</p></div>
+        </div>
+        <footer>Choose a category to explore</footer>
     </div>
-    <footer>© 2025 God's Plan Emmanuel | Share positivity daily</footer>
+
+    <!-- QUOTES SCREEN -->
+    <div id="quotesScreen" class="quotes-screen">
+        <button class="back-btn" id="backToMenuBtn">← Back to menu</button>
+        <h2 id="categoryTitle"></h2>
+        <div id="quotesContainer"></div>
+    </div>
 </div>
+
 <script>
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTJETL_5sSOAwqSVSfefmpqOjyS_Az3h9a9AZTjm6TuAqWwluEg_LfkML5YbdBzaHttWJmFTqtEqGFz/pub?output=csv";
+    // ============================================================
+    // YOUR FOUR CSV LINKS (published Google Sheets as .csv)
+    // ============================================================
+    const CSV_LINKS = {
+        birthday: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSobQavQFqfcKBScUtaU2jFC4voRiudfc5nIsqGgo5v6ozEfhYT4MC4r_UYIcXYLR8XBw12nonnNKsI/pub?output=csv",
+        motivational: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgXScNF1wk8MxWahiFRf_mBStqYB4mLd1LKRcY16zL86BZbYu-RpzLxGNoTU5MOynQrwMj7elSiouH/pub?output=csv",
+        proverbs: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRCwGKC4wGBtjHr0YtflDsJf9yyywQHGTqFxrFv12mDnw6S9T85jBkaYn20SL1BMJO2pQiEjPR9rX8C/pub?output=csv",
+        biblical: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTJETL_5sSOAwqSVSfefmpqOjyS_Az3h9a9AZTjm6TuAqWwluEg_LfkML5YbdBzaHttWJmFTqtEqGFz/pub?output=csv"
+    };
+
+    // Admin Google Form link (for you to post quotes daily – never shown to public)
     const ADMIN_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSe_BaPQOsGkHfnBlEdY5RREhtzbJebELvIawgXkXbrU2hswNw/viewform?usp=header";
-    let posts = [];
+
+    const categoryNames = {
+        birthday: "🎂 Birthday Wishes",
+        motivational: "💪 Motivational & Inspirational Quotes",
+        proverbs: "🌍 African Proverbs",
+        biblical: "📖 Biblical Quotes"
+    };
+
+    // DOM elements
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const menuScreen = document.getElementById('menuScreen');
+    const quotesScreen = document.getElementById('quotesScreen');
+    const categoryTitle = document.getElementById('categoryTitle');
+    const quotesContainer = document.getElementById('quotesContainer');
+
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
     }
-    function renderPosts() {
-        const container = document.getElementById('postsContainer');
-        if (!posts.length) {
-            container.innerHTML = '<div class="post">No posts yet. Check back soon!</div>';
+
+    // Safe CSV parser that handles commas inside quoted fields
+    async function loadQuotes(category) {
+        quotesContainer.innerHTML = '<div style="text-align:center; padding:40px;">🌟 Loading quotes... 🌟</div>';
+        const csvUrl = CSV_LINKS[category];
+        if (!csvUrl || csvUrl.includes('YOUR_')) {
+            quotesContainer.innerHTML = '<div class="post">CSV link not set. Please replace the placeholder with your actual Google Sheets CSV link.</div>';
             return;
         }
-        let html = '';
-        for (let p of posts) {
-            html += `
-                <div class="post">
-                    <div class="post-date">📅 ${escapeHtml(p.date)}</div>
-                    <div class="post-message">“${escapeHtml(p.message)}”</div>
-                    <div class="post-author">— Nana Emma</div>
-                </div>
-            `;
-        }
-        container.innerHTML = html;
-    }
-    function savePostsToCache(postsArray) {
-        try { localStorage.setItem('cachedPosts', JSON.stringify(postsArray)); } catch(e) {}
-    }
-    function loadCachedPosts() {
-        const cached = localStorage.getItem('cachedPosts');
-        if (cached) {
-            try {
-                const parsed = JSON.parse(cached);
-                if (parsed.length) { posts = parsed; renderPosts(); }
-            } catch(e) {}
-        }
-    }
-    async function fetchNewPosts() {
         try {
-            const response = await fetch(CSV_URL);
+            const response = await fetch(csvUrl);
             if (!response.ok) throw new Error();
             const csvText = await response.text();
-            const rows = csvText.split('\n').filter(row => row.trim() !== '');
-            if (rows.length < 2) return;
-            const newPosts = [];
-            for (let i = 1; i < rows.length; i++) {
-                let row = rows[i];
-                let firstComma = row.indexOf(',');
-                let secondComma = row.indexOf(',', firstComma+1);
-                let timestamp = row.substring(0, firstComma).replace(/^"|"$/g, '');
-                let message = (secondComma === -1) ? row.substring(firstComma+1).replace(/^"|"$/g, '') : row.substring(firstComma+1, secondComma).replace(/^"|"$/g, '');
-                if (message.trim() !== "") {
-                    let datePart = timestamp.split(' ')[0];
-                    newPosts.push({ date: datePart, message: message.trim() });
+            // Regex to split CSV while respecting quoted fields
+            const regex = /(".?"|[^,])(,|$)/g;
+            const lines = csvText.split('\n');
+            const quotes = [];
+            for (let i = 1; i < lines.length; i++) { // skip header row (index 0)
+                const line = lines[i].trim();
+                if (line === '') continue;
+                const fields = [];
+                let match;
+                while ((match = regex.exec(line)) !== null) {
+                    if (match[1] !== undefined) {
+                        let field = match[1].replace(/^"|"$/g, '');
+                        fields.push(field);
+                    }
+                    if (match[2] === '') break;
                 }
+                if (fields.length >= 2) {
+                    const timestamp = fields[0];
+                    const message = fields[1];
+                    const author = (fields.length >= 3 && fields[2].trim() !== '') ? fields[2] : "Nana Emma";
+                    const datePart = timestamp.split(' ')[0];
+                    if (message.trim() !== "") {
+                        quotes.push({ date: datePart, message: message.trim(), author: author.trim() });
+                    }
+                }
+                regex.lastIndex = 0; // reset regex for next line
             }
-            newPosts.reverse();
-            if (newPosts.length) {
-                posts = newPosts;
-                renderPosts();
-                savePostsToCache(posts);
+            quotes.reverse(); // newest first
+            if (quotes.length === 0) {
+                quotesContainer.innerHTML = '<div class="post">No quotes in this category yet. Check back soon!</div>';
+                return;
             }
-        } catch (err) { console.log("Fetch failed, using cache."); }
+            let html = '';
+            for (let q of quotes) {
+                html += `
+                    <div class="post">
+                        <div class="post-date">📅 ${escapeHtml(q.date)}</div>
+                        <div class="post-message">“${escapeHtml(q.message)}”</div>
+                        <div class="post-author">— ${escapeHtml(q.author)}</div>
+                    </div>
+                `;
+            }
+            quotesContainer.innerHTML = html;
+        } catch (err) {
+            console.error(err);
+            quotesContainer.innerHTML = '<div class="post">Unable to load quotes. Please check the CSV link or network.</div>';
+        }
     }
+
+    // Navigation
+    document.getElementById('continueBtn').addEventListener('click', () => {
+        welcomeScreen.style.display = 'none';
+        menuScreen.style.display = 'block';
+        quotesScreen.style.display = 'none';
+    });
+
+    document.getElementById('backToMenuBtn').addEventListener('click', () => {
+        menuScreen.style.display = 'block';
+        quotesScreen.style.display = 'none';
+        quotesContainer.innerHTML = '';
+    });
+
+    document.querySelectorAll('.card').forEach(card => {
+        card.addEventListener('click', () => {
+            const category = card.getAttribute('data-category');
+            categoryTitle.innerText = categoryNames[category] || 'Quotes';
+            menuScreen.style.display = 'none';
+            quotesScreen.style.display = 'block';
+            loadQuotes(category);
+        });
+    });
+
+    // Initial state
+    welcomeScreen.style.display = 'block';
+    menuScreen.style.display = 'none';
+    quotesScreen.style.display = 'none';
+
+    // Optional hidden admin access (using secret ?admin=true)
     if (window.location.search.includes('admin=true')) {
         let pwd = prompt("Enter admin password:");
         if (pwd === "admin123") {
@@ -179,11 +219,6 @@
         } else if (pwd !== null) {
             alert("Wrong password");
         }
-    }
-    loadCachedPosts();
-    fetchNewPosts();
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW failed', err));
     }
 </script>
 </body>
