@@ -85,14 +85,19 @@
     </div>
 </div>
 <script>
-    // Your CSV links (same as before)
+    // ============================================================
+    // 1. REPLACE THE FOUR LINKS BELOW WITH YOUR ACTUAL CSV LINKS
+    //    (Each link must point to a published Google Sheet as .csv)
+    // ============================================================
     const CSV_LINKS = {
-        birthday: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSobQavQFqfcKBScUtaU2jFC4voRiudfc5nIsqGgo5v6ozEfhYT4MC4r_UYIcXYLR8XBw12nonnNKsI/pub?output=csv",
-        motivational: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgXScNF1wk8MxWahiFRf_mBStqYB4mL1dLKRcY16zL86BZbYu-RpzLxGNoTU5MOynQrwMj7elSiouH/pub?output=csv",
-        proverbs: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRCwGKC4wGBtjHr0YtflDsJf9yyywQHGTqFxrFv12mDnw6S9T85jBkaYn20SL1BMJO2pQiEjPR9rX8C/pub?output=csv",
-        biblical: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTJETL_5sSOAwqSVSfefmpqOjyS_Az3h9a9AZTjm6TuAqWwluEg_LfkML5YbdBzaHttWJmFTqtEqGFz/pub?output=csv"
+        birthday: "https://docs.google.com/spreadsheets/d/e/YOUR_BIRTHDAY_LINK_HERE/pub?output=csv",
+        motivational: "https://docs.google.com/spreadsheets/d/e/YOUR_MOTIVATIONAL_LINK_HERE/pub?output=csv",
+        proverbs: "https://docs.google.com/spreadsheets/d/e/YOUR_PROVERBS_LINK_HERE/pub?output=csv",
+        biblical: "https://docs.google.com/spreadsheets/d/e/YOUR_BIBLICAL_LINK_HERE/pub?output=csv"
     };
+
     const ADMIN_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSe_BaPQOsGkHfnBlEdY5RREhtzbJebELvIawgXkXbrU2hswNw/viewform?usp=header";
+
     const categoryNames = {
         birthday: "🎂 Birthday Wishes",
         motivational: "💪 Motivational & Inspirational Quotes",
@@ -115,21 +120,20 @@
         quotesContainer.innerHTML = '<div style="text-align:center; padding:40px;">🌟 Loading quotes... 🌟</div>';
         const csvUrl = CSV_LINKS[category];
         if (!csvUrl || csvUrl.includes('YOUR_')) {
-            quotesContainer.innerHTML = '<div class="post">CSV link not set.</div>';
+            quotesContainer.innerHTML = '<div class="post">CSV link not set. Please replace the placeholder with your actual Google Sheets CSV link.</div>';
             return;
         }
         try {
             const response = await fetch(csvUrl);
             const csvText = await response.text();
-            // Use PapaParse to reliably parse CSV
             const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
             if (parsed.errors.length) console.warn(parsed.errors);
             const rows = parsed.data;
             if (!rows.length) {
-                quotesContainer.innerHTML = '<div class="post">No quotes in this category yet.</div>';
+                quotesContainer.innerHTML = '<div class="post">No quotes in this category yet. Check back soon!</div>';
                 return;
             }
-            // Find the columns we need (case-insensitive)
+            // Find columns (case-insensitive)
             const firstRow = rows[0];
             let timestampCol = null, quoteCol = null, authorCol = null;
             for (let key in firstRow) {
@@ -139,8 +143,7 @@
                 if (lower.includes('author')) authorCol = key;
             }
             if (!quoteCol) quoteCol = Object.keys(firstRow)[1]; // fallback to second column
-            if (!timestampCol) timestampCol = Object.keys(firstRow)[0]; // fallback to first column
-
+            if (!timestampCol) timestampCol = Object.keys(firstRow)[0];
             const quotes = [];
             for (let row of rows) {
                 let message = row[quoteCol]?.trim();
@@ -150,9 +153,9 @@
                 let datePart = timestamp.split(' ')[0];
                 quotes.push({ date: datePart, message: message, author: author });
             }
-            quotes.reverse(); // newest first
+            quotes.reverse();
             if (!quotes.length) {
-                quotesContainer.innerHTML = '<div class="post">No quotes found.</div>';
+                quotesContainer.innerHTML = '<div class="post">No quotes found in this category.</div>';
                 return;
             }
             let html = '';
