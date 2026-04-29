@@ -8,14 +8,9 @@
     <meta name="theme-color" content="#050914">
     <link rel="manifest" href="manifest.json">
     <meta name="google-site-verification" content="VLHsZy7f6Z9oDt--r6fKR2IgI2ZYa0rESW65hW5CHFE" />
-    <!-- PapaParse for reliable CSV parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         /* Full background image with overlay */
         body {
@@ -25,12 +20,14 @@
             background-position: top center;
             background-attachment: fixed;
             background-repeat: no-repeat;
-            background-color: #0a0f2a; /* fallback while image loads */
+            background-color: #0a0f2a;
             position: relative;
             color: #f5c542;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             padding: 20px;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Dark overlay to keep text readable */
@@ -41,41 +38,27 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.65); /* dark semi‑transparent overlay */
+            background-color: rgba(0, 0, 0, 0.65);
             z-index: -1;
-        }
-
-        /* Flex layout to push footer to bottom */
-        body {
-            display: flex;
-            flex-direction: column;
         }
 
         .container {
             max-width: 900px;
             margin: 0 auto;
             padding: 20px;
-            flex: 1; /* takes remaining space, pushes footer down */
+            flex: 1;
         }
 
-        .welcome-screen {
-            text-align: center;
-        }
+        .welcome-screen { text-align: center; }
 
         .profile-pic img {
-            width: 180px;
-            height: 180px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid #f5b042;
+            width: 180px; height: 180px; border-radius: 50%;
+            object-fit: cover; border: 3px solid #f5b042;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .profile-pic img:hover {
-            transform: scale(1.02);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(245, 176, 66, 0.3);
-        }
+        .profile-pic img:hover { transform: scale(1.02); }
 
         .welcome-text {
             font-size: 1.75rem;
@@ -100,13 +83,9 @@
         .continue-btn:hover {
             transform: translateY(-2px);
             background: linear-gradient(135deg, #f5c542, #e6b422);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
         }
 
-        .menu-screen,
-        .quotes-screen {
-            display: none;
-        }
+        .menu-screen, .quotes-screen { display: none; }
 
         .cards-grid {
             display: grid;
@@ -117,7 +96,7 @@
 
         .card {
             background: rgba(15, 25, 45, 0.8);
-            backdrop-filter: blur(12px) saturate(160%);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(245, 197, 66, 0.3);
             border-radius: 24px;
             padding: 35px 20px;
@@ -134,16 +113,8 @@
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 12px rgba(245, 197, 66, 0.3);
         }
 
-        .card h3 {
-            font-size: 1.6rem;
-            margin-bottom: 12px;
-            color: #f5c542;
-        }
-
-        .card p {
-            color: #e0b354;
-            font-size: 0.95rem;
-        }
+        .card h3 { font-size: 1.6rem; margin-bottom: 12px; color: #f5c542; }
+        .card p { color: #e0b354; font-size: 0.95rem; }
 
         .back-btn {
             background: rgba(20, 30, 50, 0.8);
@@ -170,8 +141,6 @@
             background-clip: text;
             -webkit-background-clip: text;
             color: transparent;
-            display: inline-block;
-            width: 100%;
         }
 
         .post {
@@ -191,31 +160,35 @@
             border-left-width: 6px;
         }
 
-        .post-date {
-            font-size: 0.8rem;
-            color: #f5b042;
-            margin-bottom: 8px;
+        .post-date { font-size: 0.8rem; color: #f5b042; margin-bottom: 8px; font-weight: bold; }
+        .post-message { font-size: 1.25rem; line-height: 1.5; margin: 10px 0; white-space: normal; word-wrap: break-word; }
+        .post-author { text-align: right; font-size: 0.9rem; color: #e0b354; margin-top: 12px; font-style: italic; border-top: 1px dashed rgba(245,197,66,0.3); padding-top: 8px; }
+
+        /* Download button styling */
+        .download-btn {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1rem;
             font-weight: bold;
-            letter-spacing: 0.5px;
+            border-radius: 40px;
+            cursor: pointer;
+            text-decoration: none;
+            margin-top: 30px;
+            transition: background 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
 
-        .post-message {
-            font-size: 1.25rem;
-            line-height: 1.5;
-            margin: 10px 0;
-            white-space: normal;
-            word-wrap: break-word;
-            font-weight: 400;
+        .download-btn:hover {
+            background: #218838;
         }
 
-        .post-author {
-            text-align: right;
-            font-size: 0.9rem;
-            color: #e0b354;
-            margin-top: 12px;
-            font-style: italic;
-            border-top: 1px dashed rgba(245, 197, 66, 0.3);
-            padding-top: 8px;
+        .button-container {
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 20px;
         }
 
         footer {
@@ -228,22 +201,11 @@
         }
 
         @media (max-width: 600px) {
-            .welcome-text {
-                font-size: 1.3rem;
-            }
-            .profile-pic img {
-                width: 140px;
-                height: 140px;
-            }
-            .post-message {
-                font-size: 1rem;
-            }
-            .cards-grid {
-                gap: 15px;
-            }
-            .card {
-                padding: 25px 15px;
-            }
+            .welcome-text { font-size: 1.3rem; }
+            .profile-pic img { width: 140px; height: 140px; }
+            .post-message { font-size: 1rem; }
+            .cards-grid { gap: 15px; }
+            .card { padding: 25px 15px; }
         }
     </style>
 </head>
@@ -278,21 +240,26 @@
                 <p>Scripture for strength</p>
             </div>
         </div>
+
+        <!-- DOWNLOAD BUTTON (APK) -->
+        <div class="button-container">
+            <a href="Motivational-Quotes.apk" class="download-btn" download>📱 Download App (APK)</a>
+            <p style="font-size:0.8rem; margin-top:10px;">For Android devices. After download, open the file to install.</p>
+        </div>
+
         <footer>Choose a category to explore</footer>
     </div>
 
     <!-- QUOTES SCREEN -->
     <div id="quotesScreen" class="quotes-screen">
         <button class="back-btn" id="backToMenuBtn">← Back to menu</button>
-        <div style="text-align: center;">
-            <h2 id="categoryTitle"></h2>
-        </div>
+        <div style="text-align: center;"><h2 id="categoryTitle"></h2></div>
         <div id="quotesContainer"></div>
     </div>
 </div>
 
 <script>
-    // ==================== CSV LINKS (correctly assigned) ====================
+    // CSV LINKS (same as before)
     const CSV_LINKS = {
         birthday: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSobQavQFqfcKBScUtaU2jFC4voRiudfc5nIsqGgo5v6ozEfhYT4MC4r_UYIcXYLR8XBw12nonnNKsI/pub?output=csv",
         motivational: "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1ONrAo95j-RHUpXVoFqHfs-q2hE2hZAlsF2i69gKmhvUanDh20hFCRGw55M59bqiDXZ1ilV-AyTna/pub?output=csv",
@@ -322,22 +289,15 @@
     async function loadQuotes(category) {
         quotesContainer.innerHTML = '<div style="text-align:center; padding:40px;">🌟 Loading quotes... 🌟</div>';
         const csvUrl = CSV_LINKS[category];
-        if (!csvUrl || csvUrl.includes('YOUR_')) {
-            quotesContainer.innerHTML = '<div class="post">CSV link not set. Please check the link.</div>';
-            return;
-        }
         try {
             const response = await fetch(csvUrl);
-            if (!response.ok) throw new Error();
             const csvText = await response.text();
             const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-            if (parsed.errors.length) console.warn(parsed.errors);
             const rows = parsed.data;
             if (!rows.length) {
                 quotesContainer.innerHTML = '<div class="post">No quotes in this category yet.</div>';
                 return;
             }
-            // Find columns (case-insensitive)
             const firstRow = rows[0];
             let timestampCol = null, quoteCol = null, authorCol = null;
             for (let key in firstRow) {
@@ -359,7 +319,7 @@
             }
             quotes.reverse();
             if (!quotes.length) {
-                quotesContainer.innerHTML = '<div class="post">No quotes found in this category.</div>';
+                quotesContainer.innerHTML = '<div class="post">No quotes found.</div>';
                 return;
             }
             let html = '';
@@ -379,7 +339,6 @@
         }
     }
 
-    // Navigation
     document.getElementById('continueBtn').onclick = () => {
         welcomeScreen.style.display = 'none';
         menuScreen.style.display = 'block';
@@ -403,15 +362,12 @@
     menuScreen.style.display = 'none';
     quotesScreen.style.display = 'none';
 
-    // Hidden admin access (using secret ?admin=true)
     if (window.location.search.includes('admin=true')) {
         let pwd = prompt("Enter admin password:");
         if (pwd === "admin123") {
             alert("Copy this link to post new quotes:\n" + ADMIN_FORM_URL);
             window.open(ADMIN_FORM_URL, '_blank');
-        } else if (pwd !== null) {
-            alert("Wrong password");
-        }
+        } else if (pwd !== null) alert("Wrong password");
     }
 </script>
 </body>
