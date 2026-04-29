@@ -10,9 +10,8 @@
     <meta name="google-site-verification" content="VLHsZy7f6Z9oDt--r6fKR2IgI2ZYa0rESW65hW5CHFE" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
-        /* (all your styles remain exactly as before – you can keep the existing CSS) */
-        /* To save space, I'm showing only the critical difference: */
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             min-height: 100vh;
             background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('emmanuel.jpg');
@@ -27,11 +26,38 @@
             display: flex;
             flex-direction: column;
         }
-        .container { max-width: 900px; margin: 0 auto; padding: 20px; flex: 1; }
-        .welcome-screen { text-align: center; }
-        .profile-pic img { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: 3px solid #f5b042; box-shadow: 0 8px 25px rgba(0,0,0,0.4); transition: transform 0.3s ease; }
-        .profile-pic img:hover { transform: scale(1.02); }
-        .welcome-text { font-size: 1.75rem; margin: 20px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .welcome-screen {
+            text-align: center;
+        }
+
+        .profile-pic img {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #f5b042;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-pic img:hover {
+            transform: scale(1.02);
+        }
+
+        .welcome-text {
+            font-size: 1.75rem;
+            margin: 20px 0;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        }
+
         .continue-btn {
             background: linear-gradient(135deg, #f5b042, #d4af37);
             color: #0a0f2a;
@@ -44,40 +70,199 @@
             transition: all 0.3s ease;
             margin-top: 30px;
         }
-        .continue-btn:hover { transform: translateY(-2px); background: linear-gradient(135deg, #f5c542, #e6b422); }
-        .menu-screen, .quotes-screen { display: none; }
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px,1fr)); gap: 25px; margin-top: 40px; }
-        .card { background: rgba(15,25,45,0.8); backdrop-filter: blur(12px); border: 1px solid rgba(245,197,66,0.3); border-radius: 24px; padding: 35px 20px; text-align: center; cursor: pointer; transition: all 0.3s ease; }
-        .card:hover { transform: translateY(-8px); background: rgba(20,30,50,0.9); border-color: rgba(245,197,66,0.8); }
-        .card h3 { font-size: 1.6rem; margin-bottom: 12px; color: #f5c542; }
-        .back-btn { background: rgba(20,30,50,0.8); border: 1px solid #f5b042; color: #f5c542; padding: 8px 20px; border-radius: 30px; cursor: pointer; margin-bottom: 25px; }
-        h2#categoryTitle { text-align: center; margin-bottom: 30px; font-size: 1.9rem; background: linear-gradient(135deg, #f5c542, #f5b042); background-clip: text; -webkit-background-clip: text; color: transparent; }
-        .post { background: rgba(10,15,35,0.75); backdrop-filter: blur(8px); border-left: 4px solid #f5c542; padding: 20px; margin-bottom: 25px; border-radius: 16px; }
-        .post-date { font-size: 0.8rem; color: #f5b042; margin-bottom: 8px; font-weight: bold; }
-        .post-message { font-size: 1.25rem; line-height: 1.5; margin: 10px 0; white-space: normal; word-wrap: break-word; }
-        .post-author { text-align: right; font-size: 0.9rem; color: #e0b354; margin-top: 12px; font-style: italic; border-top: 1px dashed rgba(245,197,66,0.3); padding-top: 8px; }
-        .explain-btn { background: rgba(50,50,80,0.8); border: 1px solid #f5c542; color: #f5c542; padding: 5px 12px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; margin-top: 10px; display: inline-block; }
-        .explanation { margin-top: 10px; padding: 8px; background: rgba(0,0,0,0.5); border-radius: 8px; font-size: 0.9rem; color: #e0e0e0; border-left: 2px solid #f5c542; display: none; }
-        .download-btn { display: inline-block; background: #28a745; color: white; padding: 12px 30px; font-size: 1.1rem; font-weight: bold; border-radius: 40px; text-decoration: none; margin-top: 30px; }
-        .button-container { text-align: center; margin-top: 40px; margin-bottom: 20px; }
-        footer { text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid rgba(245,197,66,0.2); font-size: 0.8rem; color: #c9a03d; }
-        @media (max-width: 600px) { .welcome-text { font-size: 1.3rem; } .profile-pic img { width: 140px; height: 140px; } .post-message { font-size: 1rem; } }
+
+        .continue-btn:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #f5c542, #e6b422);
+        }
+
+        .menu-screen, .quotes-screen {
+            display: none;
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+
+        .card {
+            background: rgba(15, 25, 45, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(245, 197, 66, 0.3);
+            border-radius: 24px;
+            padding: 35px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            background: rgba(20, 30, 50, 0.9);
+            border-color: rgba(245, 197, 66, 0.8);
+        }
+
+        .card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 12px;
+            color: #f5c542;
+        }
+
+        .card p {
+            color: #e0b354;
+        }
+
+        .back-btn {
+            background: rgba(20, 30, 50, 0.8);
+            border: 1px solid #f5b042;
+            color: #f5c542;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-bottom: 25px;
+        }
+
+        h2#categoryTitle {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.9rem;
+            background: linear-gradient(135deg, #f5c542, #f5b042);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .post {
+            background: rgba(10, 15, 35, 0.75);
+            backdrop-filter: blur(8px);
+            border-left: 4px solid #f5c542;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 16px;
+        }
+
+        .post-date {
+            font-size: 0.8rem;
+            color: #f5b042;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .post-message {
+            font-size: 1.25rem;
+            line-height: 1.5;
+            margin: 10px 0;
+            white-space: normal;
+            word-wrap: break-word;
+        }
+
+        .post-author {
+            text-align: right;
+            font-size: 0.9rem;
+            color: #e0b354;
+            margin-top: 12px;
+            font-style: italic;
+            border-top: 1px dashed rgba(245, 197, 66, 0.3);
+            padding-top: 8px;
+        }
+
+        .explain-btn {
+            background: rgba(50, 50, 80, 0.8);
+            border: 1px solid #f5c542;
+            color: #f5c542;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-top: 10px;
+            display: inline-block;
+        }
+
+        .explanation {
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #e0e0e0;
+            border-left: 2px solid #f5c542;
+            display: none;
+        }
+
+        .download-btn {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 40px;
+            text-decoration: none;
+            margin-top: 30px;
+        }
+
+        .button-container {
+            text-align: center;
+            margin-top: 40px;
+            margin-bottom: 20px;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(245, 197, 66, 0.2);
+            font-size: 0.8rem;
+            color: #c9a03d;
+        }
+
+        @media (max-width: 600px) {
+            .welcome-text {
+                font-size: 1.3rem;
+            }
+            .profile-pic img {
+                width: 140px;
+                height: 140px;
+            }
+            .post-message {
+                font-size: 1rem;
+            }
+        }
     </style>
 </head>
 <body>
 <div class="container">
+    <!-- WELCOME SCREEN -->
     <div id="welcomeScreen" class="welcome-screen">
-        <div class="profile-pic"><img src="emmanuel.jpg" alt="Nana Emma"></div>
+        <div class="profile-pic">
+            <img src="emmanuel.jpg" alt="Nana Emma">
+        </div>
         <div class="welcome-text">✨ Welcome to home of inspirations and motivations ✨</div>
-        <!-- THE FIXED BUTTON WITH onclick -->
-        <button class="continue-btn" id="continueBtn" onclick="goToMenu()">Continue →</button>
+        <!-- Continue button with independent onclick -->
+        <button class="continue-btn" id="continueBtn" onclick="simpleContinue()">Continue →</button>
     </div>
+
+    <!-- MENU SCREEN -->
     <div id="menuScreen" class="menu-screen">
         <div class="cards-grid">
-            <div class="card" data-category="birthday"><h3>🎂 Birthday wishes</h3><p>Send special birthday blessings</p></div>
-            <div class="card" data-category="motivational"><h3>💪 Motivational/Inspirational</h3><p>Daily words to lift your spirit</p></div>
-            <div class="card" data-category="proverbs"><h3>🌍 African Proverbs</h3><p>Wisdom from the ancestors</p></div>
-            <div class="card" data-category="biblical"><h3>📖 Biblical quotes</h3><p>Scripture for strength</p></div>
+            <div class="card" data-category="birthday">
+                <h3>🎂 Birthday wishes</h3>
+                <p>Send special birthday blessings</p>
+            </div>
+            <div class="card" data-category="motivational">
+                <h3>💪 Motivational/Inspirational</h3>
+                <p>Daily words to lift your spirit</p>
+            </div>
+            <div class="card" data-category="proverbs">
+                <h3>🌍 African Proverbs</h3>
+                <p>Wisdom from the ancestors</p>
+            </div>
+            <div class="card" data-category="biblical">
+                <h3>📖 Biblical quotes</h3>
+                <p>Scripture for strength</p>
+            </div>
         </div>
         <div class="button-container">
             <a href="Motivational-Quotes.apk" class="download-btn">📱 Download App (APK)</a>
@@ -85,6 +270,8 @@
         </div>
         <footer>Choose a category to explore</footer>
     </div>
+
+    <!-- QUOTES SCREEN -->
     <div id="quotesScreen" class="quotes-screen">
         <button class="back-btn" id="backToMenuBtn">← Back to menu</button>
         <div style="text-align: center;"><h2 id="categoryTitle"></h2></div>
@@ -92,16 +279,29 @@
     </div>
 </div>
 
+<!-- SIMPLE CONTINUE FUNCTION (always works) -->
 <script>
-    // GEMINI API and other variables (same as before)
+    function simpleContinue() {
+        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('menuScreen').style.display = 'block';
+        document.getElementById('quotesScreen').style.display = 'none';
+    }
+</script>
+
+<!-- MAIN APPLICATION SCRIPT (with all CSV, AI, etc.) -->
+<script>
+    // ==================== GEMINI API CONFIGURATION ====================
     const GEMINI_API_KEY = "AIzaSyCFWCCLCRrxptA9O3RhyMHslfHc_WlrquQ";
     const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
+
+    // CSV LINKS (corrected syntax – no stray characters)
     const CSV_LINKS = {
         birthday: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSobQavQFqfcKBScUtaU2jFC4voRiudfc5nIsqGgo5v6ozEfhYT4MC4r_UYIcXYLR8XBw12nonnNKsI/pub?output=csv",
         motivational: "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1ONrAo95j-RHUpXVoFqHfs-q2hE2hZAlsF2i69gKmhvUanDh20hFCRGw55M59bqiDXZ1ilV-AyTna/pub?output=csv",
         proverbs: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgXScNF1wk8MxWahiFRf_mBStqYB4mLd1LKRcY16zL86BZbYu-RpzLxGNoTU5MOynQrwMj7elSiouH/pub?output=csv",
         biblical: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRCwGKC4wGBtjHr0YtflDsJf9yyywQHGTqFxrFv12mDnw6S9T85jBkaYn20SL1BMJO2pQiEjPR9rX8C/pub?output=csv"
     };
+
     const ADMIN_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSe_BaPQOsGkHfnBlEdY5RREhtzbJebELvIawgXkXbrU2hswNw/viewform?usp=header";
     const categoryNames = {
         birthday: "🎂 Birthday Wishes",
@@ -109,10 +309,13 @@
         proverbs: "🌍 African Proverbs",
         biblical: "📖 Biblical Quotes"
     };
+
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
     }
+
+    // AI Explanation function
     async function explainQuote(quoteText, buttonElement) {
         const postDiv = buttonElement.closest('.post');
         let explanationDiv = postDiv.querySelector('.explanation');
@@ -126,7 +329,7 @@
         explanationDiv.style.display = 'block';
         explanationDiv.classList.add('loading');
         try {
-            const prompt = Explain the meaning of the following quote in simple, clear English: "${quoteText}". Keep the explanation short (2-3 sentences).;
+            const prompt = `Explain the meaning of the following quote in simple, clear English: "${quoteText}". Keep the explanation short (2-3 sentences).`;
             const response = await fetch(GEMINI_API_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -135,14 +338,16 @@
             if (!response.ok) throw new Error('API error');
             const data = await response.json();
             const explanation = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No explanation available.';
-            explanationDiv.innerHTML = 💡 ${escapeHtml(explanation)};
+            explanationDiv.innerHTML = `💡 ${escapeHtml(explanation)}`;
             explanationDiv.classList.remove('loading');
         } catch (err) {
-            explanationDiv.innerHTML = ⚠️ Could not explain. Error: ${err.message};
+            console.error(err);
+            explanationDiv.innerHTML = `⚠️ Could not explain. Error: ${err.message}`;
             explanationDiv.classList.add('error');
             explanationDiv.classList.remove('loading');
         }
     }
+
     async function loadQuotes(category) {
         const quotesContainer = document.getElementById('quotesContainer');
         quotesContainer.innerHTML = '<div style="text-align:center; padding:40px;">🌟 Loading quotes... 🌟</div>';
@@ -152,7 +357,10 @@
             const csvText = await response.text();
             const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
             const rows = parsed.data;
-            if (!rows.length) { quotesContainer.innerHTML = '<div class="post">No quotes in this category yet.</div>'; return; }
+            if (!rows.length) {
+                quotesContainer.innerHTML = '<div class="post">No quotes in this category yet.</div>';
+                return;
+            }
             const firstRow = rows[0];
             let timestampCol = null, quoteCol = null, authorCol = null;
             for (let key in firstRow) {
@@ -173,7 +381,10 @@
                 quotes.push({ date: datePart, message: message, author: author });
             }
             quotes.reverse();
-            if (!quotes.length) { quotesContainer.innerHTML = '<div class="post">No quotes found.</div>'; return; }
+            if (!quotes.length) {
+                quotesContainer.innerHTML = '<div class="post">No quotes found.</div>';
+                return;
+            }
             let html = '';
             for (let q of quotes) {
                 html += `
@@ -181,7 +392,9 @@
                         <div class="post-date">📅 ${escapeHtml(q.date)}</div>
                         <div class="post-message">“${escapeHtml(q.message)}”</div>
                         <div class="post-author">— ${escapeHtml(q.author)}</div>
-                        <div style="text-align:right;"><button class="explain-btn" data-quote="${escapeHtml(q.message)}">🔍 Explain</button></div>
+                        <div style="text-align:right;">
+                            <button class="explain-btn" data-quote="${escapeHtml(q.message)}">🔍 Explain</button>
+                        </div>
                     </div>
                 `;
             }
@@ -198,17 +411,15 @@
             quotesContainer.innerHTML = '<div class="post">Unable to load quotes. Check network or CSV link.</div>';
         }
     }
-    // Simple navigation functions
-    function goToMenu() {
-        document.getElementById('welcomeScreen').style.display = 'none';
-        document.getElementById('menuScreen').style.display = 'block';
-        document.getElementById('quotesScreen').style.display = 'none';
-    }
+
+    // Back button handler
     document.getElementById('backToMenuBtn').onclick = function() {
         document.getElementById('menuScreen').style.display = 'block';
         document.getElementById('quotesScreen').style.display = 'none';
         document.getElementById('quotesContainer').innerHTML = '';
     };
+
+    // Category card handlers
     document.querySelectorAll('.card').forEach(card => {
         card.onclick = function() {
             const category = this.getAttribute('data-category');
@@ -218,11 +429,13 @@
             loadQuotes(category);
         };
     });
-    // Initial state
+
+    // Initial state (welcome screen visible)
     document.getElementById('welcomeScreen').style.display = 'block';
     document.getElementById('menuScreen').style.display = 'none';
     document.getElementById('quotesScreen').style.display = 'none';
-    // Hidden admin
+
+    // Hidden admin access (using secret ?admin=true)
     if (window.location.search.includes('admin=true')) {
         let pwd = prompt("Enter admin password:");
         if (pwd === "admin123") {
