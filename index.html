@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="google-site-verification" content="VLHsZy7f6Z9oDt--r6fKR2IgI2ZYa0rESW65hW5CHFE" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>God's Plan Emmanuel | Inspirational Hub</title>
     <meta name="description" content="Birthday wishes, motivation, African proverbs, and biblical quotes">
     <meta name="theme-color" content="#050914">
     <link rel="manifest" href="manifest.json">
+    <meta name="google-site-verification" content="VLHsZy7f6Z9oDt--r6fKR2IgI2ZYa0rESW65hW5CHFE" />
     <!-- PapaParse for reliable CSV parsing -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
     <style>
@@ -17,20 +17,45 @@
             box-sizing: border-box;
         }
 
+        /* Full background image with overlay */
         body {
-            background: radial-gradient(ellipse at top, #0f172a, #020617), 
-                        repeating-radial-gradient(circle at 30% 40%, rgba(255,215,0,0.02) 0px, rgba(255,215,0,0.02) 2px, transparent 2px, transparent 8px);
-            background-blend-mode: overlay;
+            min-height: 100vh;
+            background-image: url('emmanuel.jpg');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            background-repeat: no-repeat;
+            background-color: #0a0f2a; /* fallback while image loads */
+            position: relative;
             color: #f5c542;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
             padding: 20px;
         }
 
+        /* Dark overlay to keep text readable */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.65); /* dark semi‑transparent overlay */
+            z-index: -1;
+        }
+
+        /* Flex layout to push footer to bottom */
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
         .container {
             max-width: 900px;
             margin: 0 auto;
             padding: 20px;
+            flex: 1; /* takes remaining space, pushes footer down */
         }
 
         .welcome-screen {
@@ -55,7 +80,7 @@
         .welcome-text {
             font-size: 1.75rem;
             margin: 20px 0;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
         }
 
         .continue-btn {
@@ -91,7 +116,7 @@
         }
 
         .card {
-            background: rgba(15, 25, 45, 0.65);
+            background: rgba(15, 25, 45, 0.8);
             backdrop-filter: blur(12px) saturate(160%);
             border: 1px solid rgba(245, 197, 66, 0.3);
             border-radius: 24px;
@@ -104,7 +129,7 @@
 
         .card:hover {
             transform: translateY(-8px);
-            background: rgba(20, 30, 50, 0.8);
+            background: rgba(20, 30, 50, 0.9);
             border-color: rgba(245, 197, 66, 0.8);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4), 0 0 12px rgba(245, 197, 66, 0.3);
         }
@@ -121,7 +146,7 @@
         }
 
         .back-btn {
-            background: rgba(20, 30, 50, 0.7);
+            background: rgba(20, 30, 50, 0.8);
             border: 1px solid #f5b042;
             color: #f5c542;
             padding: 8px 20px;
@@ -150,7 +175,7 @@
         }
 
         .post {
-            background: rgba(10, 15, 35, 0.7);
+            background: rgba(10, 15, 35, 0.75);
             backdrop-filter: blur(8px);
             border-left: 4px solid #f5c542;
             padding: 20px;
@@ -162,7 +187,7 @@
 
         .post:hover {
             transform: translateX(6px);
-            background: rgba(20, 30, 50, 0.8);
+            background: rgba(20, 30, 50, 0.85);
             border-left-width: 6px;
         }
 
@@ -195,7 +220,7 @@
 
         footer {
             text-align: center;
-            margin-top: 70px;
+            margin-top: 50px;
             padding-top: 20px;
             border-top: 1px solid rgba(245, 197, 66, 0.2);
             font-size: 0.8rem;
@@ -267,7 +292,7 @@
 </div>
 
 <script>
-    // ==================== ALL CSV LINKS ARE CORRECTLY INSERTED ====================
+    // ==================== CSV LINKS (correctly assigned) ====================
     const CSV_LINKS = {
         birthday: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSobQavQFqfcKBScUtaU2jFC4voRiudfc5nIsqGgo5v6ozEfhYT4MC4r_UYIcXYLR8XBw12nonnNKsI/pub?output=csv",
         motivational: "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1ONrAo95j-RHUpXVoFqHfs-q2hE2hZAlsF2i69gKmhvUanDh20hFCRGw55M59bqiDXZ1ilV-AyTna/pub?output=csv",
@@ -276,7 +301,6 @@
     };
 
     const ADMIN_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSe_BaPQOsGkHfnBlEdY5RREhtzbJebELvIawgXkXbrU2hswNw/viewform?usp=header";
-
     const categoryNames = {
         birthday: "🎂 Birthday Wishes",
         motivational: "💪 Motivational & Inspirational Quotes",
@@ -292,12 +316,7 @@
 
     function escapeHtml(str) {
         if (!str) return '';
-        return str.replace(/[&<>]/g, function(m) {
-            if (m === '&') return '&amp;';
-            if (m === '<') return '&lt;';
-            if (m === '>') return '&gt;';
-            return m;
-        });
+        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
     }
 
     async function loadQuotes(category) {
