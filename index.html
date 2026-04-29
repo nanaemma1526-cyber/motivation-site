@@ -13,15 +13,14 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         /* Full background image with overlay */
+        /* Full background image with overlay – mobile friendly */
         body {
             min-height: 100vh;
-            background-image: url('emmanuel.jpg');
+            background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)), url('emmanuel.jpg');
             background-size: cover;
             background-position: top center;
-            background-attachment: fixed;
             background-repeat: no-repeat;
             background-color: #0a0f2a;
-            position: relative;
             color: #f5c542;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
@@ -29,6 +28,8 @@
             display: flex;
             flex-direction: column;
         }
+
+        /* Remove the old ::before overlay – it's now combined in the background-image */
 
         /* Dark overlay to keep text readable */
         body::before {
