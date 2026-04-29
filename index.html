@@ -296,12 +296,6 @@
         biblical: "📖 Biblical Quotes"
     };
 
-    const welcomeScreen = document.getElementById('welcomeScreen');
-    const menuScreen = document.getElementById('menuScreen');
-    const quotesScreen = document.getElementById('quotesScreen');
-    const categoryTitle = document.getElementById('categoryTitle');
-    const quotesContainer = document.getElementById('quotesContainer');
-
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
@@ -316,7 +310,6 @@
             explanationDiv.className = 'explanation';
             postDiv.appendChild(explanationDiv);
         }
-        // If already visible and loaded, just toggle? We'll always fetch fresh.
         explanationDiv.classList.remove('error');
         explanationDiv.innerHTML = '🤔 Thinking...';
         explanationDiv.style.display = 'block';
@@ -348,6 +341,7 @@
     }
 
     async function loadQuotes(category) {
+        const quotesContainer = document.getElementById('quotesContainer');
         quotesContainer.innerHTML = '<div style="text-align:center; padding:40px;">🌟 Loading quotes... 🌟</div>';
         const csvUrl = CSV_LINKS[category];
         try {
@@ -397,7 +391,6 @@
                 `;
             }
             quotesContainer.innerHTML = html;
-            // Attach event listeners to all explain buttons
             document.querySelectorAll('.explain-btn').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.stopPropagation();
@@ -411,29 +404,45 @@
         }
     }
 
-    // Navigation
-    document.getElementById('continueBtn').onclick = () => {
-        welcomeScreen.style.display = 'none';
-        menuScreen.style.display = 'block';
-        quotesScreen.style.display = 'none';
-    };
-    document.getElementById('backToMenuBtn').onclick = () => {
-        menuScreen.style.display = 'block';
-        quotesScreen.style.display = 'none';
-        quotesContainer.innerHTML = '';
-    };
-    document.querySelectorAll('.card').forEach(card => {
-        card.onclick = () => {
-            const category = card.getAttribute('data-category');
-            categoryTitle.innerText = categoryNames[category];
-            menuScreen.style.display = 'none';
-            quotesScreen.style.display = 'block';
-            loadQuotes(category);
+    // Wait for DOM to be fully loaded before attaching event handlers
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log("DOM ready – setting up navigation.");
+        const welcomeScreen = document.getElementById('welcomeScreen');
+        const menuScreen = document.getElementById('menuScreen');
+        const quotesScreen = document.getElementById('quotesScreen');
+        const categoryTitle = document.getElementById('categoryTitle');
+        const quotesContainer = document.getElementById('quotesContainer');
+        const continueBtn = document.getElementById('continueBtn');
+        const backToMenuBtn = document.getElementById('backToMenuBtn');
+
+        if (!continueBtn) console.error("continueBtn not found!");
+        if (!menuScreen) console.error("menuScreen not found!");
+
+        continueBtn.onclick = () => {
+            console.log("Continue clicked");
+            welcomeScreen.style.display = 'none';
+            menuScreen.style.display = 'block';
+            quotesScreen.style.display = 'none';
         };
+        backToMenuBtn.onclick = () => {
+            menuScreen.style.display = 'block';
+            quotesScreen.style.display = 'none';
+            if (quotesContainer) quotesContainer.innerHTML = '';
+        };
+        document.querySelectorAll('.card').forEach(card => {
+            card.onclick = () => {
+                const category = card.getAttribute('data-category');
+                categoryTitle.innerText = categoryNames[category];
+                menuScreen.style.display = 'none';
+                quotesScreen.style.display = 'block';
+                loadQuotes(category);
+            };
+        });
+        // Initial state
+        welcomeScreen.style.display = 'block';
+        menuScreen.style.display = 'none';
+        quotesScreen.style.display = 'none';
     });
-    welcomeScreen.style.display = 'block';
-    menuScreen.style.display = 'none';
-    quotesScreen.style.display = 'none';
 
     // Hidden admin access (using secret ?admin=true)
     if (window.location.search.includes('admin=true')) {
