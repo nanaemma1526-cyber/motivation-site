@@ -12,7 +12,6 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        /* Full background image with overlay */
         /* Full background image with overlay – mobile friendly */
         body {
             min-height: 100vh;
@@ -27,20 +26,6 @@
             padding: 20px;
             display: flex;
             flex-direction: column;
-        }
-
-        /* Remove the old ::before overlay – it's now combined in the background-image */
-
-        /* Dark overlay to keep text readable */
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.65);
-            z-index: -1;
         }
 
         .container {
@@ -165,7 +150,41 @@
         .post-message { font-size: 1.25rem; line-height: 1.5; margin: 10px 0; white-space: normal; word-wrap: break-word; }
         .post-author { text-align: right; font-size: 0.9rem; color: #e0b354; margin-top: 12px; font-style: italic; border-top: 1px dashed rgba(245,197,66,0.3); padding-top: 8px; }
 
-        /* Download button styling */
+        /* Explain button and explanation area */
+        .explain-btn {
+            background: rgba(50, 50, 80, 0.8);
+            border: 1px solid #f5c542;
+            color: #f5c542;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        .explain-btn:hover {
+            background: rgba(245, 197, 66, 0.3);
+        }
+        .explanation {
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #e0e0e0;
+            border-left: 2px solid #f5c542;
+            display: none;
+        }
+        .explanation.loading {
+            display: block;
+            font-style: italic;
+        }
+        .explanation.error {
+            color: #ffaa66;
+        }
+
+        /* Download button */
         .download-btn {
             display: inline-block;
             background: #28a745;
@@ -181,11 +200,9 @@
             transition: background 0.3s ease;
             box-shadow: 0 4px 10px rgba(0,0,0,0.2);
         }
-
         .download-btn:hover {
             background: #218838;
         }
-
         .button-container {
             text-align: center;
             margin-top: 40px;
@@ -242,9 +259,8 @@
             </div>
         </div>
 
-        <!-- DOWNLOAD BUTTON (APK) -->
         <div class="button-container">
-            <a href="Motivational-Quotes.apk" class="download-btn" download>📱 Download App (APK)</a>
+            <a href="Motivational-Quotes.apk" class="download-btn">📱 Download App (APK)</a>
             <p style="font-size:0.8rem; margin-top:10px;">For Android devices. After download, open the file to install.</p>
         </div>
 
@@ -260,6 +276,10 @@
 </div>
 
 <script>
+    // ==================== GEMINI API CONFIGURATION ====================
+    const GEMINI_API_KEY = "AIzaSyCFWCCLCRrxptA9O3RhyMHslfHc_WlrquQ";
+    const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
+
     // CSV LINKS (same as before)
     const CSV_LINKS = {
         birthday: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSobQavQFqfcKBScUtaU2jFC4voRiudfc5nIsqGgo5v6ozEfhYT4MC4r_UYIcXYLR8XBw12nonnNKsI/pub?output=csv",
@@ -285,6 +305,46 @@
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
+    }
+
+    // AI Explanation function
+    async function explainQuote(quoteText, buttonElement) {
+        const postDiv = buttonElement.closest('.post');
+        let explanationDiv = postDiv.querySelector('.explanation');
+        if (!explanationDiv) {
+            explanationDiv = document.createElement('div');
+            explanationDiv.className = 'explanation';
+            postDiv.appendChild(explanationDiv);
+        }
+        // If already visible and loaded, just toggle? We'll always fetch fresh.
+        explanationDiv.classList.remove('error');
+        explanationDiv.innerHTML = '🤔 Thinking...';
+        explanationDiv.style.display = 'block';
+        explanationDiv.classList.add('loading');
+        
+        try {
+            const prompt = Explain the meaning of the following quote in simple, clear English: "${quoteText}". Keep the explanation short (2-3 sentences).;
+            const response = await fetch(GEMINI_API_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ parts: [{ text: prompt }] }]
+                })
+            });
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error?.message || 'API error');
+            }
+            const data = await response.json();
+            const explanation = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No explanation available.';
+            explanationDiv.innerHTML = 💡 ${escapeHtml(explanation)};
+            explanationDiv.classList.remove('loading');
+        } catch (err) {
+            console.error(err);
+            explanationDiv.innerHTML = ⚠️ Could not explain. Error: ${err.message};
+            explanationDiv.classList.add('error');
+            explanationDiv.classList.remove('loading');
+        }
     }
 
     async function loadQuotes(category) {
@@ -330,16 +390,28 @@
                         <div class="post-date">📅 ${escapeHtml(q.date)}</div>
                         <div class="post-message">“${escapeHtml(q.message)}”</div>
                         <div class="post-author">— ${escapeHtml(q.author)}</div>
+                        <div style="text-align:right;">
+                            <button class="explain-btn" data-quote="${escapeHtml(q.message)}">🔍 Explain</button>
+                        </div>
                     </div>
                 `;
             }
             quotesContainer.innerHTML = html;
+            // Attach event listeners to all explain buttons
+            document.querySelectorAll('.explain-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const quote = btn.getAttribute('data-quote');
+                    explainQuote(quote, btn);
+                });
+            });
         } catch (err) {
             console.error(err);
             quotesContainer.innerHTML = '<div class="post">Unable to load quotes. Check network or CSV link.</div>';
         }
     }
 
+    // Navigation
     document.getElementById('continueBtn').onclick = () => {
         welcomeScreen.style.display = 'none';
         menuScreen.style.display = 'block';
@@ -363,6 +435,7 @@
     menuScreen.style.display = 'none';
     quotesScreen.style.display = 'none';
 
+    // Hidden admin access (using secret ?admin=true)
     if (window.location.search.includes('admin=true')) {
         let pwd = prompt("Enter admin password:");
         if (pwd === "admin123") {
