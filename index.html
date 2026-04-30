@@ -2,76 +2,417 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Test – Category Cards</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>God's Plan Emmanuel | Inspirational Hub</title>
+    <meta name="theme-color" content="#050914">
+    <link rel="manifest" href="manifest.json">
+    <meta name="google-site-verification" content="VLHsZy7f6Z9oDt--r6fKR2IgI2ZYa0rESW65hW5CHFE" />
     <style>
-        body { background: #0a0f2a; color: #f5c542; font-family: sans-serif; padding: 20px; }
-        .cards-grid { display: flex; gap: 20px; flex-wrap: wrap; }
-        .card { background: #1e2a3a; padding: 20px; border-radius: 12px; cursor: pointer; }
-        .quotes-screen { margin-top: 20px; }
-        .post { background: #1e2a3a; margin-bottom: 10px; padding: 10px; border-left: 4px solid gold; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url('emmanuel.jpg');
+            background-size: cover;
+            background-position: top center;
+            background-repeat: no-repeat;
+            background-color: #0a0f2a;
+            color: #f5c542;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+        }
+
+        .welcome-screen { text-align: center; }
+        .profile-pic img {
+            width: 180px; height: 180px; border-radius: 50%;
+            object-fit: cover; border: 3px solid #f5b042;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+        }
+        .welcome-text { font-size: 1.75rem; margin: 20px 0; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+        .continue-btn {
+            background: linear-gradient(135deg, #f5b042, #d4af37);
+            color: #0a0f2a;
+            border: none;
+            padding: 12px 40px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border-radius: 40px;
+            cursor: pointer;
+            margin-top: 30px;
+        }
+        .menu-screen, .quotes-screen { display: none; }
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 25px;
+            margin-top: 40px;
+        }
+        .card {
+            background: rgba(15, 25, 45, 0.8);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(245,197,66,0.3);
+            border-radius: 24px;
+            padding: 35px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .card:hover { transform: translateY(-8px); background: rgba(20,30,50,0.9); border-color: rgba(245,197,66,0.8); }
+        .card h3 { font-size: 1.6rem; margin-bottom: 12px; color: #f5c542; }
+        .back-btn {
+            background: rgba(20,30,50,0.8);
+            border: 1px solid #f5b042;
+            color: #f5c542;
+            padding: 8px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            margin-bottom: 25px;
+        }
+        h2#categoryTitle { text-align: center; margin-bottom: 30px; font-size: 1.9rem; background: linear-gradient(135deg, #f5c542, #f5b042); background-clip: text; -webkit-background-clip: text; color: transparent; }
+        .post {
+            background: rgba(10,15,35,0.75);
+            backdrop-filter: blur(8px);
+            border-left: 4px solid #f5c542;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 16px;
+        }
+        .post-message { font-size: 1.25rem; line-height: 1.5; margin: 10px 0; word-wrap: break-word; }
+        .post-author { text-align: right; font-size: 0.9rem; color: #e0b354; margin-top: 10px; font-style: italic; border-top: 1px dashed rgba(245,197,66,0.3); padding-top: 8px; }
+        .explain-btn {
+            background: rgba(50,50,80,0.8);
+            border: 1px solid #f5c542;
+            color: #f5c542;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            cursor: pointer;
+            margin-top: 10px;
+            display: inline-block;
+        }
+        .explanation {
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(0,0,0,0.5);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: #e0e0e0;
+            border-left: 2px solid #f5c542;
+            display: none;
+        }
+        .download-btn {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 12px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 40px;
+            text-decoration: none;
+            margin-top: 30px;
+        }
+        .button-container { text-align: center; margin-top: 40px; margin-bottom: 20px; }
+        footer { text-align: center; margin-top: 50px; padding-top: 20px; border-top: 1px solid rgba(245,197,66,0.2); font-size: 0.8rem; color: #c9a03d; }
+        @media (max-width: 600px) {
+            .welcome-text { font-size: 1.3rem; }
+            .profile-pic img { width: 140px; height: 140px; }
+            .post-message { font-size: 1rem; }
+        }
     </style>
 </head>
 <body>
-<div id="menuScreen">
-    <div class="cards-grid">
-        <div class="card" data-category="birthday">🎂 Birthday</div>
-        <div class="card" data-category="motivational">💪 Motivational</div>
-        <div class="card" data-category="proverbs">🌍 African Proverbs</div>
-        <div class="card" data-category="biblical">📖 Biblical</div>
+<div class="container">
+    <div id="welcomeScreen" class="welcome-screen">
+        <div class="profile-pic"><img src="emmanuel.jpg" alt="Nana Emma"></div>
+        <div class="welcome-text">✨ Welcome to home of inspirations and motivations ✨</div>
+        <button class="continue-btn" id="continueBtn" onclick="simpleContinue()">Continue →</button>
     </div>
-</div>
-<div id="quotesScreen" style="display:none;">
-    <button id="backBtn">← Back</button>
-    <h2 id="categoryTitle"></h2>
-    <div id="quotesContainer"></div>
+    <div id="menuScreen" class="menu-screen">
+        <div class="cards-grid">
+            <div class="card" data-category="birthday"><h3>🎂 Birthday wishes</h3><p>Send special birthday blessings</p></div>
+            <div class="card" data-category="motivational"><h3>💪 Motivational/Inspirational</h3><p>Daily words to lift your spirit</p></div>
+            <div class="card" data-category="proverbs"><h3>🌍 African Proverbs</h3><p>Wisdom from the ancestors</p></div>
+            <div class="card" data-category="biblical"><h3>📖 Biblical quotes</h3><p>Scripture for strength</p></div>
+        </div>
+        <div class="button-container">
+            <a href="Motivational-Quotes.apk" class="download-btn">📱 Download App (APK)</a>
+            <p style="font-size:0.8rem; margin-top:10px;">For Android devices. After download, open the file to install.</p>
+        </div>
+        <footer>Choose a category to explore</footer>
+    </div>
+    <div id="quotesScreen" class="quotes-screen">
+        <button class="back-btn" id="backToMenuBtn">← Back to menu</button>
+        <div style="text-align: center;"><h2 id="categoryTitle"></h2></div>
+        <div id="quotesContainer"></div>
+    </div>
 </div>
 
 <script>
-    const CSV_LINKS = {
-        birthday: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSobQavQFqfcKBScUtaU2jFC4voRiudfc5nIsqGgo5v6ozEfhYT4MC4r_UYIcXYLR8XBw12nonnNKsI/pub?output=csv",
-        motivational: "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1ONrAo95j-RHUpXVoFqHfs-q2hE2hZAlsF2i69gKmhvUanDh20hFCRGw55M59bqiDXZ1ilV-AyTna/pub?output=csv",
-        proverbs: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgXScNF1wk8MxWahiFRf_mBStqYB4mLd1LKRcY16zL86BZbYu-RpzLxGNoTU5MOynQrwMj7elSiouH/pub?output=csv",
-        biblical: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRCwGKC4wGBtjHr0YtflDsJf9yyywQHGTqFxrFv12mDnw6S9T85jBkaYn20SL1BMJO2pQiEjPR9rX8C/pub?output=csv"
-    };
-    const menu = document.getElementById('menuScreen');
-    const quotesScreen = document.getElementById('quotesScreen');
-    const quotesContainer = document.getElementById('quotesContainer');
-    const categoryTitle = document.getElementById('categoryTitle');
+    function simpleContinue() {
+        document.getElementById('welcomeScreen').style.display = 'none';
+        document.getElementById('menuScreen').style.display = 'block';
+        document.getElementById('quotesScreen').style.display = 'none';
+    }
 
+    // ------------------------------
+    // 50 QUOTES PER CATEGORY (HARDCODED IN JS)
+    // ------------------------------
+    const quotesDB = {
+        birthday: [],
+        motivational: [],
+        proverbs: [],
+        biblical: []
+    };
+
+    // Helper: add quotes using loops to keep code manageable
+    // Each quote is an object { text, author }
+    function generateBirthdayQuotes() {
+        const messages = [
+            "Happy birthday! May your day be filled with joy and laughter.",
+            "Wishing you a fantastic birthday and a year of blessings.",
+            "Another year older, another year wiser. Enjoy your special day!",
+            "May your birthday be as wonderful as you are.",
+            "Celebrate your amazing journey around the sun. Happy birthday!",
+            "Cheers to you on your birthday! May all your dreams come true.",
+            "Birthday hugs and best wishes to you.",
+            "May this year bring you everything you’ve been hoping for.",
+            "You deserve the best today and always. Happy birthday!",
+            "Enjoy every moment of your special day.",
+            "Happy birthday to someone who makes the world brighter.",
+            "May your cake be sweet and your memories sweeter.",
+            "Wishing you a day full of love, laughter, and cake.",
+            "Another year of wonderful you! Happy birthday.",
+            "May your birthday be just the beginning of a year full of happiness.",
+            "You are a gift to everyone who knows you. Celebrate well!",
+            "Happy birthday! May your heart be full and your spirit light.",
+            "Enjoy your day – you’ve earned it! Happy birthday.",
+            "May the joy you give to others return to you tenfold today.",
+            "Happy birthday to a truly special person."
+        ];
+        const authors = ["Nana Emma", "Anonymous", "African Proverb", "Unknown", "Friend"];
+        for (let i = 0; i < 50; i++) {
+            let text = messages[i % messages.length] + (i < messages.length ? "" : " (repeat)");
+            let author = authors[Math.floor(Math.random() * authors.length)];
+            quotesDB.birthday.push({ text, author });
+        }
+    }
+
+    function generateMotivationalQuotes() {
+        const messages = [
+            "Believe you can and you're halfway there. – Theodore Roosevelt",
+            "Your only limit is your mind.",
+            "Small steps every day lead to big results.",
+            "Don't stop when you're tired; stop when you're done.",
+            "The future depends on what you do today. – Gandhi",
+            "You are stronger than you think.",
+            "Keep going; everything you need will come to you at the right time.",
+            "Dream it. Wish it. Do it.",
+            "Success is not final; failure is not fatal. – Winston Churchill",
+            "Hardship often prepares ordinary people for an extraordinary destiny.",
+            "Believe in yourself and all that you are.",
+            "The only way to do great work is to love what you do. – Steve Jobs",
+            "It always seems impossible until it's done. – Nelson Mandela",
+            "Don't watch the clock; do what it does. Keep going.",
+            "You are capable of amazing things.",
+            "Make today so awesome that yesterday gets jealous.",
+            "Strive for progress, not perfection.",
+            "The secret of getting ahead is getting started. – Mark Twain",
+            "Act as if what you do makes a difference. It does. – William James",
+            "Everything you've ever wanted is on the other side of fear."
+        ];
+        const authors = ["Nana Emma", "Theodore Roosevelt", "Gandhi", "Winston Churchill", "Steve Jobs", "Nelson Mandela", "Mark Twain", "William James"];
+        for (let i = 0; i < 50; i++) {
+            let text = messages[i % messages.length] + (i < messages.length ? "" : " (inspired)");
+            let author = authors[Math.floor(Math.random() * authors.length)];
+            quotesDB.motivational.push({ text, author });
+        }
+    }
+
+    function generateProverbs() {
+        const proverbs = [
+            "A bird that flies off the earth and lands on an anthill is still on the ground.",
+            "The lion's roar does not frighten the brave.",
+            "Wisdom is like a baobab tree; no one can embrace it alone.",
+            "Smooth seas do not make skillful sailors.",
+            "The child who is not embraced by the village will burn it down to feel its warmth.",
+            "If you want to go fast, go alone. If you want to go far, go together.",
+            "The fool speaks, the wise man listens.",
+            "Rain does not fall on one roof alone.",
+            "Where there is a will, there is a way.",
+            "A problem shared is half solved.",
+            "The one who asks questions does not lose his way.",
+            "However long the night, the dawn will break.",
+            "The best time to plant a tree was 20 years ago. The second best time is now.",
+            "Do not look where you fell, but where you slipped.",
+            "Unity is strength, division is weakness.",
+            "The old woman looks after the child to grow, and the child looks after the old woman to not fall.",
+            "A single bracelet does not jingle.",
+            "The path is made by walking.",
+            "He who learns, teaches.",
+            "The axe forgets what the tree remembers."
+        ];
+        const authors = ["African Proverb", "Nana Emma", "Anonymous"];
+        for (let i = 0; i < 50; i++) {
+            let text = proverbs[i % proverbs.length] + (i < proverbs.length ? "" : " (wisdom)");
+            let author = authors[Math.floor(Math.random() * authors.length)];
+            quotesDB.proverbs.push({ text, author });
+        }
+    }
+
+    function generateBiblicalQuotes() {
+        const verses = [
+            "I can do all things through Christ who strengthens me. – Philippians 4:13",
+            "Be strong and courageous. Do not be afraid. – Joshua 1:9",
+            "The Lord is my shepherd; I shall not want. – Psalm 23:1",
+            "Trust in the Lord with all your heart. – Proverbs 3:5",
+            "Love your neighbor as yourself. – Mark 12:31",
+            "For God so loved the world that He gave His only Son. – John 3:16",
+            "Ask and it will be given to you. – Matthew 7:7",
+            "I have fought the good fight, I have finished the race. – 2 Timothy 4:7",
+            "The joy of the Lord is your strength. – Nehemiah 8:10",
+            "With God all things are possible. – Matthew 19:26",
+            "Be still, and know that I am God. – Psalm 46:10",
+            "Let your light shine before others. – Matthew 5:16",
+            "Cast all your anxiety on Him because He cares for you. – 1 Peter 5:7",
+            "Do not be overcome by evil, but overcome evil with good. – Romans 12:21",
+            "I sought the Lord, and He answered me. – Psalm 34:4",
+            "The Lord is my light and my salvation. – Psalm 27:1",
+            "Blessed are the peacemakers. – Matthew 5:9",
+            "He gives strength to the weary. – Isaiah 40:29",
+            "Rejoice always, pray continually. – 1 Thessalonians 5:16-17",
+            "Faith is the assurance of things hoped for. – Hebrews 11:1"
+        ];
+        const authors = ["Bible", "The Apostle Paul", "King David", "Jesus", "Solomon"];
+        for (let i = 0; i < 50; i++) {
+            let text = verses[i % verses.length] + (i < verses.length ? "" : " (scripture)");
+            let author = authors[Math.floor(Math.random() * authors.length)];
+            quotesDB.biblical.push({ text, author });
+        }
+    }
+
+    // Generate the arrays
+    generateBirthdayQuotes();
+    generateMotivationalQuotes();
+    generateProverbs();
+    generateBiblicalQuotes();
+
+    // ------------------------------
+    // Hugging Face AI Explain (as before)
+    // ------------------------------
+    const HF_TOKEN = "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";
+    const HF_API_URL = "https://api-inference.huggingface.co/models/google/flan-t5-large";
+
+    async function explainWithHuggingFace(quoteText) {
+        const prompt = `Explain this quote in simple English: "${quoteText}"`;
+        const response = await fetch(HF_API_URL, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${HF_TOKEN}`,
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ inputs: prompt })
+        });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const data = await response.json();
+        return data[0]?.generated_text || data.generated_text || "No explanation generated.";
+    }
+
+    async function explainQuote(quoteText, buttonElement) {
+        const postDiv = buttonElement.closest('.post');
+        if (!postDiv) return;
+        let explanationDiv = postDiv.querySelector('.explanation');
+        if (!explanationDiv) {
+            explanationDiv = document.createElement('div');
+            explanationDiv.className = 'explanation';
+            postDiv.appendChild(explanationDiv);
+        }
+        explanationDiv.style.display = 'block';
+        explanationDiv.innerHTML = '🤔 Thinking...';
+        try {
+            const explanation = await explainWithHuggingFace(quoteText);
+            explanationDiv.innerHTML = `💡 ${escapeHtml(explanation)}`;
+        } catch (err) {
+            console.error(err);
+            explanationDiv.innerHTML = "💡 This quote encourages reflection. (AI explanation temporarily unavailable.)";
+        }
+    }
+
+    // Escape HTML
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
+    }
+
+    // Load quotes for a category (with author)
+    function loadQuotes(category) {
+        const container = document.getElementById('quotesContainer');
+        const quotes = quotesDB[category];
+        if (!quotes || quotes.length === 0) {
+            container.innerHTML = '<div class="post">No quotes yet. Check back soon!</div>';
+            return;
+        }
+        let html = '';
+        for (let q of quotes) {
+            html += `
+                <div class="post">
+                    <div class="post-message">“${escapeHtml(q.text)}”</div>
+                    <div class="post-author">— ${escapeHtml(q.author)}</div>
+                    <div style="text-align:right;">
+                        <button class="explain-btn" data-quote="${escapeHtml(q.text)}">🔍 Explain</button>
+                    </div>
+                </div>
+            `;
+        }
+        container.innerHTML = html;
+        // Attach explain events
+        document.querySelectorAll('.explain-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const quote = btn.getAttribute('data-quote');
+                explainQuote(quote, btn);
+            });
+        });
+    }
+
+    // Category card handlers
     document.querySelectorAll('.card').forEach(card => {
-        card.onclick = () => {
-            const category = card.getAttribute('data-category');
-            categoryTitle.innerText = category;
-            menu.style.display = 'none';
-            quotesScreen.style.display = 'block';
+        card.onclick = function() {
+            const category = this.getAttribute('data-category');
+            const categoryNames = {
+                birthday: "🎂 Birthday wishes",
+                motivational: "💪 Motivational Quotes",
+                proverbs: "🌍 African Proverbs",
+                biblical: "📖 Biblical Quotes"
+            };
+            document.getElementById('categoryTitle').innerText = categoryNames[category];
+            document.getElementById('menuScreen').style.display = 'none';
+            document.getElementById('quotesScreen').style.display = 'block';
             loadQuotes(category);
         };
     });
-    document.getElementById('backBtn').onclick = () => {
-        menu.style.display = 'block';
-        quotesScreen.style.display = 'none';
-        quotesContainer.innerHTML = '';
+
+    document.getElementById('backToMenuBtn').onclick = function() {
+        document.getElementById('menuScreen').style.display = 'block';
+        document.getElementById('quotesScreen').style.display = 'none';
+        document.getElementById('quotesContainer').innerHTML = '';
     };
 
-    async function loadQuotes(category) {
-        quotesContainer.innerHTML = 'Loading...';
-        const url = CSV_LINKS[category];
-        try {
-            const res = await fetch(url);
-            const csv = await res.text();
-            const parsed = Papa.parse(csv, { header: true });
-            const rows = parsed.data;
-            let html = '';
-            for (let row of rows) {
-                let quote = row['Today\'s motivational/inspirational quotes'] || row['Quote'] || row[Object.keys(row)[1]];
-                if (quote) html += <div class="post">“${quote}”</div>;
-            }
-            quotesContainer.innerHTML = html || 'No quotes.';
-        } catch (err) {
-            quotesContainer.innerHTML = 'Error loading.';
-        }
+    // Hidden admin panel (password protect)
+    if (window.location.search.includes('admin=true')) {
+        let pwd = prompt("Enter admin password:");
+        if (pwd === "Ingemmanuel9016") { // change this to something strong
+            alert("You are admin. To add/edit quotes, modify the 'quotesDB' object in the HTML source code.");
+        } else if (pwd !== null) alert("Wrong password");
     }
 </script>
 </body>
