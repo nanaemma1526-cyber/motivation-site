@@ -155,10 +155,10 @@
             font-size: 1.25rem;
             line-height: 1.5;
             margin: 10px 0;
-            white-space: normal;
             word-wrap: break-word;
-            max-width: 100%;
             overflow-wrap: break-word;
+            white-space: normal;
+            max-width: 100%;
         }
 
         .post-author {
@@ -237,17 +237,14 @@
 </head>
 <body>
 <div class="container">
-    <!-- WELCOME SCREEN -->
     <div id="welcomeScreen" class="welcome-screen">
         <div class="profile-pic">
             <img src="emmanuel.jpg" alt="Nana Emma">
         </div>
         <div class="welcome-text">✨ Welcome to home of inspirations and motivations ✨</div>
-        <!-- Continue button with independent onclick -->
         <button class="continue-btn" id="continueBtn" onclick="simpleContinue()">Continue →</button>
     </div>
 
-    <!-- MENU SCREEN -->
     <div id="menuScreen" class="menu-screen">
         <div class="cards-grid">
             <div class="card" data-category="birthday">
@@ -274,7 +271,6 @@
         <footer>Choose a category to explore</footer>
     </div>
 
-    <!-- QUOTES SCREEN -->
     <div id="quotesScreen" class="quotes-screen">
         <button class="back-btn" id="backToMenuBtn">← Back to menu</button>
         <div style="text-align: center;"><h2 id="categoryTitle"></h2></div>
@@ -282,7 +278,6 @@
     </div>
 </div>
 
-<!-- SIMPLE CONTINUE FUNCTION (always works) -->
 <script>
     function simpleContinue() {
         document.getElementById('welcomeScreen').style.display = 'none';
@@ -291,13 +286,51 @@
     }
 </script>
 
-<!-- MAIN APPLICATION SCRIPT (with all CSV, AI, etc.) -->
 <script>
-    // ==================== GEMINI API CONFIGURATION ====================
-    const GEMINI_API_KEY = "AIzaSyCFWCCLCRrxptA9O3RhyMHslfHc_WlrquQ";
-    const GEMINI_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=" + GEMINI_API_KEY;
+    // ==================== HUGGING FACE API (FREE, NO CREDIT CARD) ====================
+    const HF_TOKEN = "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";
+    const HF_API_URL = "https://api-inference.huggingface.co/models/google/flan-t5-large";
 
-    // CSV LINKS (corrected syntax – no stray characters)
+    async function explainWithHuggingFace(quoteText) {
+        const prompt = Explain this quote in simple English: "${quoteText}";
+        const response = await fetch(HF_API_URL, {
+            method: "POST",
+            headers: {
+                "Authorization": Bearer ${HF_TOKEN},
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ inputs: prompt })
+        });
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.error || HTTP ${response.status});
+        }
+        const data = await response.json();
+        // The response format varies; flan-t5-large returns an array with a "generated_text" field
+        const explanation = data[0]?.generated_text || data.generated_text || "No explanation generated.";
+        return explanation;
+    }
+
+    async function explainQuote(quoteText, buttonElement) {
+        const postDiv = buttonElement.closest('.post');
+        let explanationDiv = postDiv.querySelector('.explanation');
+        if (!explanationDiv) {
+            explanationDiv = document.createElement('div');
+            explanationDiv.className = 'explanation';
+            postDiv.appendChild(explanationDiv);
+        }
+        explanationDiv.style.display = 'block';
+        explanationDiv.innerHTML = '🤔 Thinking...';
+        try {
+            const explanation = await explainWithHuggingFace(quoteText);
+            explanationDiv.innerHTML = 💡 ${escapeHtml(explanation)};
+        } catch (err) {
+            console.error(err);
+            explanationDiv.innerHTML = ⚠️ Could not explain. Error: ${err.message}. The free API may be rate-limited; try again later.;
+        }
+    }
+
+    // ==================== CSV LOADING (same as before) ====================
     const CSV_LINKS = {
         birthday: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSobQavQFqfcKBScUtaU2jFC4voRiudfc5nIsqGgo5v6ozEfhYT4MC4r_UYIcXYLR8XBw12nonnNKsI/pub?output=csv",
         motivational: "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1ONrAo95j-RHUpXVoFqHfs-q2hE2hZAlsF2i69gKmhvUanDh20hFCRGw55M59bqiDXZ1ilV-AyTna/pub?output=csv",
@@ -308,7 +341,7 @@
     const ADMIN_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSe_BaPQOsGkHfnBlEdY5RREhtzbJebELvIawgXkXbrU2hswNw/viewform?usp=header";
     const categoryNames = {
         birthday: "🎂 Birthday Wishes",
-        motivational: "💪 Motivational Quotes",
+        motivational: "💪 Motivational & Inspirational Quotes",
         proverbs: "🌍 African Proverbs",
         biblical: "📖 Biblical Quotes"
     };
@@ -316,39 +349,6 @@
     function escapeHtml(str) {
         if (!str) return '';
         return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
-    }
-
-    // AI Explanation function
-    async function explainQuote(quoteText, buttonElement) {
-        const postDiv = buttonElement.closest('.post');
-        let explanationDiv = postDiv.querySelector('.explanation');
-        if (!explanationDiv) {
-            explanationDiv = document.createElement('div');
-            explanationDiv.className = 'explanation';
-            postDiv.appendChild(explanationDiv);
-        }
-        explanationDiv.classList.remove('error');
-        explanationDiv.innerHTML = '🤔 Thinking...';
-        explanationDiv.style.display = 'block';
-        explanationDiv.classList.add('loading');
-        try {
-            const prompt = `Explain the meaning of the following quote in simple, clear English: "${quoteText}". Keep the explanation short (2-3 sentences).`;
-            const response = await fetch(GEMINI_API_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
-            });
-            if (!response.ok) throw new Error('API error');
-            const data = await response.json();
-            const explanation = data.candidates?.[0]?.content?.parts?.[0]?.text || 'No explanation available.';
-            explanationDiv.innerHTML = `💡 ${escapeHtml(explanation)}`;
-            explanationDiv.classList.remove('loading');
-        } catch (err) {
-            console.error(err);
-            explanationDiv.innerHTML = `⚠️ Could not explain. Error: ${err.message}`;
-            explanationDiv.classList.add('error');
-            explanationDiv.classList.remove('loading');
-        }
     }
 
     async function loadQuotes(category) {
@@ -415,14 +415,12 @@
         }
     }
 
-    // Back button handler
     document.getElementById('backToMenuBtn').onclick = function() {
         document.getElementById('menuScreen').style.display = 'block';
         document.getElementById('quotesScreen').style.display = 'none';
         document.getElementById('quotesContainer').innerHTML = '';
     };
 
-    // Category card handlers
     document.querySelectorAll('.card').forEach(card => {
         card.onclick = function() {
             const category = this.getAttribute('data-category');
@@ -433,15 +431,13 @@
         };
     });
 
-    // Initial state (welcome screen visible)
     document.getElementById('welcomeScreen').style.display = 'block';
     document.getElementById('menuScreen').style.display = 'none';
     document.getElementById('quotesScreen').style.display = 'none';
 
-    // Hidden admin access (using secret ?admin=true)
     if (window.location.search.includes('admin=true')) {
         let pwd = prompt("Enter admin password:");
-        if (pwd === "admin123") {
+        if (pwd === "Ingemmanuel9016") {
             alert("Copy this link to post new quotes:\n" + ADMIN_FORM_URL);
             window.open(ADMIN_FORM_URL, '_blank');
         } else if (pwd !== null) alert("Wrong password");
