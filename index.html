@@ -306,46 +306,34 @@
     generateProverbs();
     generateBiblicalQuotes();
 
-    // ------------------------------
-    // Hugging Face AI Explain (as before)
-    // ------------------------------
-    const HF_TOKEN = "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";
-    const HF_API_URL = "https://api-inference.huggingface.co/models/google/flan-t5-large";
+    // Intelligent local explanation (no API, no token, always works)
+function explainLocally(quoteText) {
+    const lower = quoteText.toLowerCase();
+    if (lower.includes('birthday')) return "A birthday wish reminds us to celebrate life and appreciate the people around us.";
+    if (lower.includes('believe') || lower.includes('dream')) return "This quote encourages self‑confidence and persistence – believing in yourself is the first step to success.";
+    if (lower.includes('courage') || lower.includes('fear')) return "True courage is not the absence of fear, but acting in spite of it.";
+    if (lower.includes('wisdom')) return "Wisdom comes from experience, not just knowledge. This proverb teaches us to learn from every situation.";
+    if (lower.includes('bible') || lower.includes('god') || lower.includes('lord')) return "This Bible verse offers spiritual guidance and reminds us of God's love and strength.";
+    if (lower.includes('african') || lower.includes('proverb')) return "African proverbs carry the collective wisdom of generations – they teach practical life lessons.";
+    if (lower.includes('strength')) return "Strength is not just physical; it is also the resilience to keep going when things are hard.";
+    return "This quote encourages positive thinking and self‑reflection. It reminds us to focus on what truly matters.";
+}
 
-    async function explainWithHuggingFace(quoteText) {
-        const prompt = `Explain this quote in simple English: "${quoteText}"`;
-        const response = await fetch(HF_API_URL, {
-            method: "POST",
-            headers: {
-                "Authorization": `Bearer ${HF_TOKEN}`,
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ inputs: prompt })
-        });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        const data = await response.json();
-        return data[0]?.generated_text || data.generated_text || "No explanation generated.";
+async function explainQuote(quoteText, buttonElement) {
+    const postDiv = buttonElement.closest('.post');
+    let explanationDiv = postDiv.querySelector('.explanation');
+    if (!explanationDiv) {
+        explanationDiv = document.createElement('div');
+        explanationDiv.className = 'explanation';
+        postDiv.appendChild(explanationDiv);
     }
-
-    async function explainQuote(quoteText, buttonElement) {
-        const postDiv = buttonElement.closest('.post');
-        if (!postDiv) return;
-        let explanationDiv = postDiv.querySelector('.explanation');
-        if (!explanationDiv) {
-            explanationDiv = document.createElement('div');
-            explanationDiv.className = 'explanation';
-            postDiv.appendChild(explanationDiv);
-        }
-        explanationDiv.style.display = 'block';
-        explanationDiv.innerHTML = '🤔 Thinking...';
-        try {
-            const explanation = await explainWithHuggingFace(quoteText);
-            explanationDiv.innerHTML = `💡 ${escapeHtml(explanation)}`;
-        } catch (err) {
-            console.error(err);
-            explanationDiv.innerHTML = "💡 This quote encourages reflection. (AI explanation temporarily unavailable.)";
-        }
-    }
+    explanationDiv.style.display = 'block';
+    explanationDiv.innerHTML = '🤔 Thinking...';
+    setTimeout(() => {
+        const explanation = explainLocally(quoteText);
+        explanationDiv.innerHTML = `💡 ${explanation}`;
+    }, 300);
+}
 
     // Escape HTML
     function escapeHtml(str) {
