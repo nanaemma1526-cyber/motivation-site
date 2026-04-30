@@ -312,108 +312,42 @@
     }
 
     async function explainQuote(quoteText, buttonElement) {
-        const postDiv = buttonElement.closest('.post');
-        let explanationDiv = postDiv.querySelector('.explanation');
-        if (!explanationDiv) {
-            explanationDiv = document.createElement('div');
-            explanationDiv.className = 'explanation';
-            postDiv.appendChild(explanationDiv);
-        }
-        explanationDiv.style.display = 'block';
-        explanationDiv.innerHTML = '🤔 Thinking...';
-        try {
-            const explanation = await explainWithHuggingFace(quoteText);
-            explanationDiv.innerHTML = 💡 ${escapeHtml(explanation)};
-        } catch (err) {
-            console.error(err);
-            explanationDiv.innerHTML = ⚠️ Could not explain. Error: ${err.message}. The free API may be rate-limited; try again later.;
-        }
+    console.log("Explain clicked for quote:", quoteText); // debug
+    const postDiv = buttonElement.closest('.post');
+    if (!postDiv) {
+        console.error("Could not find .post parent");
+        return;
     }
-
-    // ==================== CSV LOADING (same as before) ====================
-    const CSV_LINKS = {
-        birthday: "https://docs.google.com/spreadsheets/d/e/2PACX-1vSobQavQFqfcKBScUtaU2jFC4voRiudfc5nIsqGgo5v6ozEfhYT4MC4r_UYIcXYLR8XBw12nonnNKsI/pub?output=csv",
-        motivational: "https://docs.google.com/spreadsheets/d/e/2PACX-1vT1ONrAo95j-RHUpXVoFqHfs-q2hE2hZAlsF2i69gKmhvUanDh20hFCRGw55M59bqiDXZ1ilV-AyTna/pub?output=csv",
-        proverbs: "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgXScNF1wk8MxWahiFRf_mBStqYB4mLd1LKRcY16zL86BZbYu-RpzLxGNoTU5MOynQrwMj7elSiouH/pub?output=csv",
-        biblical: "https://docs.google.com/spreadsheets/d/e/2PACX-1vRCwGKC4wGBtjHr0YtflDsJf9yyywQHGTqFxrFv12mDnw6S9T85jBkaYn20SL1BMJO2pQiEjPR9rX8C/pub?output=csv"
-    };
-
-    const ADMIN_FORM_URL = "https://docs.google.com/forms/d/e/1FAIpQLSe_BaPQOsGkHfnBlEdY5RREhtzbJebELvIawgXkXbrU2hswNw/viewform?usp=header";
-    const categoryNames = {
-        birthday: "🎂 Birthday Wishes",
-        motivational: "💪 Motivational & Inspirational Quotes",
-        proverbs: "🌍 African Proverbs",
-        biblical: "📖 Biblical Quotes"
-    };
-
-    function escapeHtml(str) {
-        if (!str) return '';
-        return str.replace(/[&<>]/g, m => m === '&' ? '&amp;' : (m === '<' ? '&lt;' : '&gt;'));
+    let explanationDiv = postDiv.querySelector('.explanation');
+    if (!explanationDiv) {
+        explanationDiv = document.createElement('div');
+        explanationDiv.className = 'explanation';
+        postDiv.appendChild(explanationDiv);
     }
-
-    async function loadQuotes(category) {
-        const quotesContainer = document.getElementById('quotesContainer');
-        quotesContainer.innerHTML = '<div style="text-align:center; padding:40px;">🌟 Loading quotes... 🌟</div>';
-        const csvUrl = CSV_LINKS[category];
-        try {
-            const response = await fetch(csvUrl);
-            const csvText = await response.text();
-            const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-            const rows = parsed.data;
-            if (!rows.length) {
-                quotesContainer.innerHTML = '<div class="post">No quotes in this category yet.</div>';
-                return;
-            }
-            const firstRow = rows[0];
-            let timestampCol = null, quoteCol = null, authorCol = null;
-            for (let key in firstRow) {
-                let lower = key.toLowerCase();
-                if (lower.includes('timestamp') || lower.includes('date')) timestampCol = key;
-                if (lower.includes('quote') || lower.includes('message') || lower.includes('motivational')) quoteCol = key;
-                if (lower.includes('author')) authorCol = key;
-            }
-            if (!quoteCol) quoteCol = Object.keys(firstRow)[1];
-            if (!timestampCol) timestampCol = Object.keys(firstRow)[0];
-            const quotes = [];
-            for (let row of rows) {
-                let message = row[quoteCol]?.trim();
-                if (!message) continue;
-                let timestamp = row[timestampCol] || '';
-                let author = authorCol ? (row[authorCol]?.trim() || "Nana Emma") : "Nana Emma";
-                let datePart = timestamp.split(' ')[0];
-                quotes.push({ date: datePart, message: message, author: author });
-            }
-            quotes.reverse();
-            if (!quotes.length) {
-                quotesContainer.innerHTML = '<div class="post">No quotes found.</div>';
-                return;
-            }
-            let html = '';
-            for (let q of quotes) {
-                html += `
-                    <div class="post">
-                        <div class="post-date">📅 ${escapeHtml(q.date)}</div>
-                        <div class="post-message">“${escapeHtml(q.message)}”</div>
-                        <div class="post-author">— ${escapeHtml(q.author)}</div>
-                        <div style="text-align:right;">
-                            <button class="explain-btn" data-quote="${escapeHtml(q.message)}">🔍 Explain</button>
-                        </div>
-                    </div>
-                `;
-            }
-            quotesContainer.innerHTML = html;
-            document.querySelectorAll('.explain-btn').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const quote = btn.getAttribute('data-quote');
-                    explainQuote(quote, btn);
-                });
-            });
-        } catch (err) {
-            console.error(err);
-            quotesContainer.innerHTML = '<div class="post">Unable to load quotes. Check network or CSV link.</div>';
-        }
+    // Show the box immediately with a loading state
+    explanationDiv.style.display = 'block';
+    explanationDiv.innerHTML = '🤔 Thinking...';
+    
+    // Try to get AI explanation, but fallback to generic if fails
+    try {
+        const prompt = Explain this quote in simple English: "${quoteText}";
+        const response = await fetch(HF_API_URL, {
+            method: "POST",
+            headers: {
+                "Authorization": Bearer ${HF_TOKEN},
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ inputs: prompt })
+        });
+        if (!response.ok) throw new Error(HTTP ${response.status});
+        const data = await response.json();
+        const explanation = data[0]?.generated_text || data.generated_text || "No explanation generated.";
+        explanationDiv.innerHTML = 💡 ${escapeHtml(explanation)};
+    } catch (err) {
+        console.error("API error:", err);
+        explanationDiv.innerHTML = "💡 This quote encourages reflection. (AI explanation temporarily unavailable.)";
     }
+}
 
     document.getElementById('backToMenuBtn').onclick = function() {
         document.getElementById('menuScreen').style.display = 'block';
